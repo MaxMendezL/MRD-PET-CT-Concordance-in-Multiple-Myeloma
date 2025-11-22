@@ -1,0 +1,159 @@
+Authors,year,id_type,doi,ID,study_type,journal,title,n_total,n _available_for_analysis,n,age,setting,therapy_line,mrd_reported,mrd_method,mrd_sensitivity,mrd_timing,mrd_neg_pct,mrd_pos_pct,mrd_timepoint_1,mrd_timepoint_2,pet_reported,Simultaneous mrd_pet_measurement,pet_timing,pet_neg_pct,pet_pos_pct,pet_deauville_reported,pet_interpretation,focal_lesion_pct_baseline,bm_positivity_pct,r_iss_stage,cytogenetic_risk,high_genetic_abnormalities,pct_ASCT,pct_mrdneg_petneg,pct_mrdneg_petpos,pct_mrdpos_petneg,pct_mrdpos_petpos,pfs_mrd_neg,pfs_mrd_neg_ci,pfs_pet,pfs_pet_ci,pfs_dual_neg,pfs_dual_neg_ci,os_mrd,os_mrd_ci,os_pet,os_pet_ci,os_dual,os_dual_ci,ttnt_months,ttnt_event,bias,missing_notes,imaging_review,km_needed,study_id,submission,last_modified
+"Alonso R, Cedena MT, Gomez-Grande A, Rios R, Moraleda JM, Cabanas V, Moreno MJ, Lopez-Jimenez J, Martin F, Sanz A, Valeri A, Jimenez A, Sanchez R, Lahuerta JJ, Martinez-Lopez J",2019,PubMed,https://doi.org/10.1002/ajh.25507,31074033,Retrospective,Am J Hematol,Imaging and bone marrow assessments improve minimal residual disease prediction in multiple myeloma.,115,103,103,62,Newly Diagnosed MM,Total Therapy 4√ê6 trial series,Yes,Flow cytometry,1.00E-04,Post-ASCT,67,33,Baseline at CR,Annually at follow up,Yes,Yes,"Post-induction, simultaneous with MRD",81.6,18.4,No ,Italian MM imaging criteria (IMPeTUs),54.2,,"I: 34 %, II: 38 %, III: 28 %, Not_Classifiable: 0 %",Yes,22.9,73,54.4,12.6,27.2,5.8,0.53,0.28-0.98,0.18,0.09-0.36,0.221,0.139-0.352,0.46,0.22-0.98,0.14,0.04-0.54,0.22,0.07-0.72,,,"QUIPS:
+Study participation: Moderate (retrospective; analysis restricted to those with both PET and MFC).
+Study attrition: Moderate (missing tests/time-points typical of routine care).
+Prognostic-factor measurement: High (PET/CT likely read with clinical context; criteria not fully standardized across ~10 years).
+Outcome measurement: Low (IMWG-defined PFS/OS).
+Confounding: Moderate (heterogeneous treatments; multivariable/landmark used but residual confounding likely).
+Statistical analysis & reporting: Moderate (KM, Cox, landmark reported; assumptions/MI/sensitivity not clearly detailed).QUADAS-2:
+-Patient selection: moderate–high risk (retrospective, paired-test requirement). 
+-Index test (PET/CT): high risk, moderate concern (reader not blinded; thresholds not fully standardized), 
+-Reference standard (MFC): moderate risk, moderate concern (blinding to PET not stated)
+-Flow/timing: low risk (assessments  “in parallel”)
+QUADAS2-2:
+Patient selection: High (retrospective; paired-test requirement may induce selection).
+Index test (PET/CT): High (reader blinding not stated; thresholds/criteria not fully standardized).
+Reference standard (MFC): Unclear (blinding to PET not reported).
+Flow & timing: Low (assessments performed “in parallel” / close interval)",,TRUE,YES,Alonso R et al 2019,2025-05-27 14:19:46.869697,2025-05-27 14:19:46.869697
+"Moreau, P; Zweegman, S; Perrot, A; Hulin, C; Caillot, D; Facon, T; Leleu, X; Belhadj, K; Karlin, L; Benboubker, L; Levin, M-D; Minnema, MC; Jamet, B; Bodet-Milin, C; Sonneveld, P; Lambert, J; Pei, L; De Boer, C; Vermeulen, J; Kempfenkel, T; Kraeber-Bodere, F",2019,CENTRAL,doi.org/10.1182/blood-2019-123143,CN-02244090,Prospective companion analysis (CASSIOPEIA),Blood (ASH abstract),Evaluation of prognostic value of positron emission tomography-computed tomography (PET/CT) in transplant-eligible newly diagnosed multiple myeloma (NDMM) phase 3 cassiopeia study patients: cassiopet study results,184,176,176,NA,Newly Diagnosed MM,4 cycles of pre-autologous stem cell transplant (ASCT) induction and 2 cycles of post-ASCT consolidation with D-VTd or VTd,Yes,Flow cytometry,1.00E-05,Post-consolidation (~day 100 after ASCT),64.8,35.2,Baseline,Day post-consolidation,Yes,"No, <30 Days window",Post-consolidation (~day 100 after ASCT),89.2,10.8,Yes,Italian MM imaging criteria (IMPeTUs),67.2,79.9,"I: NA %, II: NA %, III: NA %, ",No,,,58,6.8,31.3,4,,,,,,,,,,,,,,,"QUIPS:
+Study participation: High (only patients with assessable PET/CT were analyzed; smaller cohort than parent trial).
+Study attrition: High (many randomized patients lacked post-consolidation PET/MRD; baseline PET-negative patients excluded from some post-consolidation analyses).
+Prognostic-factor measurement: Low (central PET reads per IMPeTUs/Deauville by experienced readers; readers blinded to treatment).
+Outcome measurement: Moderate (PFS reported mainly as short-term rates with relatively immature follow-up).
+Confounding: High (no adjusted models reported; possible imbalances between VTd vs D-VTd could confound PFS).
+Statistical analysis & reporting: Moderate (kappa/ORs and crude PFS rates provided, but limited adjusted estimates or assumption checks).
+QUADAS-2:
+Patient selection: High (paired-test subset and exclusions may introduce selection bias).
+Index test (PET/CT): Unclear (prespecified criteria and centralized reads, but blinding to MRD not stated).
+Reference standard (MFC): Unclear (prespecified threshold; blinding to PET not reported).
+Flow & timing: Low (post-consolidation PET and MRD generally within ≤30 days).",,TRUE,NO,Moreau et al 2019-CASSIOPET,2025-05-28 20:47:31.545456,2025-05-28 20:47:31.545456
+"Zamagni E, Nanni C, Dozza L, Carlier T, Bailly C, Tacchetti P, Versari A, Chauvie S, Gallamini A, Gamberi B, Caillot D, Patriarca F, Macro M, Boccadoro M, Garderet L, Barbato S, Fanti S, Perrot A, Gay F, Sonneveld P, Karlin L, Cavo M, Bodet-Milin C, Moreau P, Kraeber-Bodere F",2021,Pubmed,https://doi.org/10.1200/JCO.20.00386,33151787,Prospective cohort,J Clin Oncol,Standardization of (18)F-FDG-PET/CT According to Deauville Criteria for Metabolic Complete Response Definition in Newly Diagnosed Multiple Myeloma.,228,228,228,59,Newly Diagnosed MM,"IFM/DFCI2009 prospectively evaluated the combination of eight cycles of lenalidomide, bortezomib, and dexamethasone (RVD) versus RVD plus autologous stem-cell transplantation (ASCT), followed by lenalidomide maintenance. EMN02/HO95 prospectively compared single versus double ASCT versus proteasome inhibitor based intensification therapy after three to four cycles of bortezomib-based induction therapy and consolidation therapy versus no consolidation, followed by lenalidomide maintenance",Yes,"NGF (8-color, BM)","1e-5, 1e-6",Post-induction,,,3-4 Weeks after Induction,3 and 4 Weeks after Inending Therapy of ASCTduction,Yes,Yes,"The Imaging Young Myeloma (IMAJEM) substudy at baseline, within 3 and 4 weeks, upon induction treatment, and 3 and 4 weeks after ending
+therapy or ASCT.
+EMN02/HO95 imaging substudy aimed prospectively to evaluate FDG-PET/CT at diagnosis, after four cycles of induction therapy, and before maintenance.
+",69,31,Yes,Italian MM imaging criteria (IMPeTUs),78.1,98.5,"I: 29 %, II: 59 %, III: 11.5 %",Yes,14,57,28,18.7,17,36.3,,,0.6,0.37-0.95,,,,,0.34,0.16-0.70,,,,,"QUIPS:
+Study participation: Moderate — prospective trial substudies in transplant-eligible NDMM; strong internal validity but limited generalizability.
+Study attrition: Low — modest missingness at the pre-maintenance PET landmark.
+Prognostic-factor measurement: Low — centralized, blinded PET/CT review using standardized acquisition and Deauville scoring.
+Outcome measurement: Low — PFS/OS with prespecified pre-maintenance landmark and adequate follow-up.
+Study confounding: Low — multivariable Cox with adjustment and stratification by trial.
+Statistical analysis & reporting: Moderate — robust modeling; DS < 4 cut-off appears data-driven (post-hoc).
+QUADAS-2:
+This paper isn’t a diagnostic-accuracy study with a defined reference standard, so QUADAS-2 is not strictly applicable. If you must map domains:
+Patient selection: Some concerns — trial subset may limit applicability.
+Index test (PET): Low — centralized, blinded, standardized Deauville scoring at a prespecified landmark.
+Reference standard: Not applicable.
+Flow & timing: Low — uniform pre-maintenance timing and centralized workflow.
+Overall: Not applicable.",,TRUE,YES,Zamagni E et al 2021,2025-06-17 20:17:55.807891,2025-06-17 20:17:55.807891
+"Boeckle D, Tabares P, Zhou X, Schimanski S, Steinhardt MJ, Bittrich M, Seebacher E, Ulbrich M, Wilnit A, Metz C, Heidemeier A, Bley T, Werner R, Buck A, Einsele H, Kort√É¬ºm KM, Beilhack A, Rasche L",2022,PubMed,doi.org/10.1111/bjh.18249,35582835,Prospective cohort,Br J Haematol,Minimal residual disease and imaging-guided consolidation strategies in newly diagnosed and relapsed refractory multiple myeloma.,102,78,78,64,"Newly Diagnosed MM, Relapsed Refractory MM",,Yes,Flow cytometry,1.00E-06,Maintenance,52.6,47.4,Post-ASCT  and/or after consolidation (NDMM) measured at VGPR,At achievement of VGPR in transplant ineligible or in RRMM,Yes,Yes,Maintenance,84.6,15.4,Not reported,ESMO-IMWG 2021 standard imaging criteria,,,"I: 45.2 %, II: 26.5 %, III: 14.7 %, Not_Classifiable: 13.7 %",Yes,25,91.2,45,8,39,8,,,,,,,,,,,,,,,"QUIPS:
+Study participation: Moderate — single-centre, real-world cohort restricted to ≥VGPR, mixing NDMM and RRMM; imaging not always performed (capacity or patient decline), introducing selection bias.
+Study attrition: Moderate — PET/DWI-MRI available in ≈ 78/102 patients with some missing assessments.
+Prognostic-factor measurement: Moderate — NGF followed EuroFlow standards; PET/DWI-MRI used predefined criteria, but MRI was clinical rather than protocol-mandated.
+Outcome measurement: Moderate — PFS defined from MRD assessment with relatively short follow-up.
+Confounding: High — heterogeneous disease stage and therapy lines, with MRD-triggered consolidation in a non-randomized setting.
+Statistical analysis & reporting: Moderate — standard survival analyses presented, but non-comparative design limits inference.
+QUADAS-2:
+Patient selection: High — convenience sample; eligibility dependent on response (≥VGPR) and test availability.
+Index tests (MRD and imaging): Low for NGF (standardized method); Some concerns for imaging (institutional reads, mixed PET/DWI-MRI modalities).
+Reference standard: Unclear/High — no independent gold standard for residual disease.
+Flow & timing: Some concerns — MRD and imaging performed close in time (median ≈ 1 day) but not always simultaneous or complete.",Imaging positivity was more common in RRMM than NDMM (57% vs. 26%). Uses ISS instead or R-ISS,FALSE,YES,Broeckle D et al 2022,2025-06-17 21:23:40.19339,2025-06-17 21:23:40.19339
+"Zamagni E, Oliva S, Gay F, Capra A, Rota-Scalabrini D, D'Agostino M, Belotti A, Galli M, Racca M, Zambello R, Gamberi B, Albano D, Bertamini L, Versari A, Grasso M, Sgherza N, Priola C, Fioritoni F, Patriarca F, De Cicco G, Villanova T, Pascarella A, Zucchetta P, Tacchetti P, Fanti S, Mancuso K, Barbato S, Boccadoro M, Musto P, Cavo M, Nanni C",2023,PubMed,10.1016/j.eclinm.2023.102017,37396807,RCT,EClinicalMedicine,Impact of minimal residual disease standardised assessment by FDG-PET/CT in transplant-eligible patients with newly diagnosed multiple myeloma enrolled in the imaging sub-study of the FORTE trial.,109,109,109,57,"Newly Diagnosed MM, Transplant-eligible","Standardization of EMN02/HO95 and IFM/DFCI-2009 Trials. Carfilzomib, lenalidomide, dexamethasone (KRD) induction-autologous stem cell transplantation (ASCT) intensification-KRd consolidation (arm A); KRd12 (arm B) and carfilzomib, cyclophosphamide, dexamethasone (KCd) induction-ASCT intensification- KCd consolidation (arm C)",Yes,Flow cytometry,1.00E-05,Post-induction,76,24,Baseline,Pre-Maintenance,Yes,Yes,Post-induction,63,37,Yes,Italian MM imaging criteria (IMPeTUs),93,99,"I: 39 %, II: 51 %, III: 10 %, Not_Classifiable: 0 %",Yes,26,60.6,57.8,18.3,5.5,18.3,1.04,0.45-2.38,0.31,0.14-0.66,0.45,0.23-0.88,1.01,0.28-3.64,0.17,0.05-0.56,0.29,0.09-0.96,12,,"QUIPS:
+Study participation: Moderate — imaging sub-study (109/474) within an RCT; baseline features broadly similar; multi-centre execution.
+Study attrition: Low — paired baseline and pre-maintenance PET required; reasons for exclusions described; landmark mitigates bias.
+Prognostic-factor measurement: Low — PET prespecified (Deauville <4 for focal lesions and BM) per EANM; BM-MFC standard methods.
+Outcome measurement: Low — PFS/OS clearly defined with long follow-up.
+Confounding: Low — Cox adjusted for ISS, high-risk FISH, LDH, treatment arm, age; centre effect tested.
+Statistical analysis & reporting: Low — prespecified thresholds; landmark to avoid immortal-time bias; robust multivariable results.
+QUADAS-2:
+Patient selection: High — non-consecutive imaging sub-study within a trial _ selection bias possible (paired-test requirement).
+Index test (PET): Unclear — standardized Deauville/EANM and centralized reads, but blinding to BM-MRD not explicitly stated.
+Reference standard (BM-MRD): Unclear — standard methods, but blinding to PET not reported.
+Flow & timing: Low — PET and BM-MRD performed pre-maintenance within ~20 days; paired assessments in 109 patients.
+Applicability: Patient selection/applicability: Moderate — transplant-eligible NDMM, pre-maintenance landmark (spectrum narrower than routine care). Index test applicability: Low — PET methods/criteria align with clinical practice and IMWG context. Reference standard applicability: Low — BM-MRD per standard definitions.",,TRUE,NO,Zamagni E et al 2023,2025-05-27 18:52:16.054042,2025-05-27 18:52:16.054042
+"Mookerjee A, Gupta R, Kumar R, Sharma A, Pandey RM, Kumar L",2023,PubMed,doi.org/10.1038/s41409-023-02017-0,37328681,Prospective cohort,Bone Marrow Transplant,Dual assessment with multiparameter flow cytometry and (18)F-FDG PET/CT scan provides enhanced prediction of measurable residual disease after autologous haemopoietic stem cell transplant in myeloma-a prospective study.,160,131,131,52,Transplant-eligible,The median interval from diagnosis to transplant was 12.1 months. The median follow up of the cohort is 39 months (range: 11 to 63.9 months).Post ASCT patients received maintenance therapy with lenalidomide 10 mg daily for 21 days every month for √¢‚Ä∞¬•2 years,Yes,Flow cytometry,1.00E-06,Post-ASCT,70.2,29.8,Baseline,Day 100 Post ASCT,Yes,Yes,Post-consolidation (~day 100 after ASCT),83.2,16.8,Yes,"DS 2-3 = negative, DS 4 = positive",,,"I: 22 %, II: 48 %, III: 30 %, ",Yes,12,,59.5,10.7,23.7,6.1,0.15,0.10-0.30,0.36,0.20-0.80,0.32,0.20-0.50,0.21,0.10-0.50,0.26,0.10-0.70,,,,,"QUIPS:
+Study participation: Low — consecutive post-ASCT cohort with a clearly described setting; single-centre limits generalizability.
+Study attrition: Moderate — not all enrolled patients had both tests (BM-flow 138/160; PET 131/160); single on-treatment assessment at day +100.
+Prognostic-factor measurement: Moderate — BM flow MRD used a validated protocol; PET used Deauville adapted from lymphoma without fully prespecified multiple-myeloma thresholds or stated blinding.
+Outcome measurement: Low — PFS/OS/TTP defined with adequate follow-up and IMWG response criteria.
+Confounding: Moderate — multivariable analyses reported, but cytogenetics missing for many patients.
+Statistical analysis & reporting: Low — Kaplan–Meier and Cox models with consistent effect estimates.
+QUADAS-2:
+Patient selection: High/Some concerns — consecutive transplant-eligible cohort only (restricted spectrum) and incomplete pairing.
+Index test (PET): Unclear/Some concerns — Deauville applied, but positivity threshold and blinding to BM-MRD not fully specified.
+Reference standard (BM-MRD by flow): Low — validated protocol.
+Flow & timing: Low — PET and BM-MRD both at day +100; some incomplete pairing.
+Applicability: Target condition: Low concern — MRD definitions align with clinical practice. Patient spectrum: Some concerns — post-ASCT only.",,FALSE,YES,Mookerjee A et al 2023,2025-06-13 07:41:32.87798,2025-06-13 07:41:32.87798
+Noorgaard JN et al,2023,PubMed,10.1038/s41375-023-01998-7,37568010,Prospective,Leukemia,Intensifying treatment in PET-positive multiple myeloma patients after upfront autologous stem cell transplantation,159,159,159,62,Nordic Myeloma Study Group (6 centers),1st line (post-ASCT),Yes,"NGF (8-color, BM)",1.00E-05,Post-ASCT; pre/post KRd,,,Pre-KRd (PET+ only),Post-KRd,Yes,No,Post-consolidation (~day 100 after ASCT),66.66666667,33.33333333,Yes,Italian MM imaging criteria (IMPeTUs),,,"I: 49 %, II: 34 %, III: 17 %",Yes,20,,,,,,,,,,,,,,,,,,,,"QUIPS:
+Study participation: Moderate — multicentre but limited to post-ASCT patients in ≥VGPR, mainly after specific induction regimens.
+Study attrition: Low — near-complete completion of planned PET/MRD assessments.
+Prognostic-factor measurement: Low — PET centrally reviewed by two nuclear medicine physicians using IMPETUS/Deauville criteria; NGF performed with a standardized high-sensitivity kit.
+Outcome measurement: Moderate — primary endpoints focused on PET conversion and PET/MRD concordance; survival follow-up ongoing and secondary.
+Confounding: High — KRd consolidation selectively administered to PET-positive patients (non-randomized, response-adapted design).
+Statistical analysis & reporting: Low — predefined endpoints and appropriate comparative tests clearly described.
+QUADAS-2:
+Patient selection: High — enriched, non-random inclusion of post-ASCT responders, introducing spectrum and selection bias.
+Index tests: Low — PET (centralized read, Deauville ≥ 4 per IMPETUS) and BM-MRD (standardized NGF) both well-defined.
+Reference standard: Unclear/High — no universally accepted gold standard for “true” residual disease.
+Flow & timing: Low–Some concerns — PET screening was protocolized and MRD sampling performed before/after KRd with narrow windows, though not always strictly simultaneous.",MRD and PET measured only in PET+ group post-ASCT; pre/post KRd; high discordance.,FALSE,NO,Noogaard JN et al 2023,2025-06-17 19:45:25.420012,2025-06-17 19:45:25.420018
+"Fonseca R, Arribas M, Wiedmeier-Nutor JE, et al.",2023,PubMed,10.1038/s41408-023-00794-x,,Retrospective,Blood Cancer Journal,Integrated analysis of next generation sequencing MRD and PET scan in transplant eligible myeloma patients,136,136,136,62.5,,,Yes,NGS (clonoSEQ),1.00E-06,Post-consolidation (Day 100 after ASCT),25,75,Post-Induction/Pre-Maintenance,Day 100 Post ASCT,Yes,Yes,Post-consolidation (~day 100 after ASCT),81.6,18.6,Not reported,"Binary (+/-), radiologist read",,,"I:  %, II:  %, III: 11.3 %",Yes,19.2,,23.5,1.5,58.1,16.9,,,,,0.57,0.22-1.47,0.42,0.09-1.94,,,0.6,0.13-2.73,27.5,,"QUIPS:
+Study participation: Moderate — restricted to front-line ASCT recipients; many lacked PET at day +100.
+Study attrition: Moderate — missing PET at the prespecified landmark and limited sequential MRD testing; complete-case analyses applied.
+Prognostic-factor measurement: Low — high-sensitivity NGS MRD at a prespecified day +100 threshold.
+Outcome measurement: Low — TTNT and OS defined and analysed using Kaplan–Meier and Cox methods.
+Confounding: Moderate — variable post-ASCT maintenance/consolidation and uneven PET availability; residual confounding likely.
+Statistical analysis & reporting: Moderate — hazard ratios with CIs reported, but no imputation for missing PET and several analyses exploratory.
+QUADAS-2:
+Patient selection: High — PET availability conditioned inclusion (non-consecutive ASCT cohort); selection bias likely.
+Index test (PET): Some concerns — locally interpreted PET/CT; centralized, blinded review and uniform thresholds not reported.
+Index test (MRD): Low — standardized NGS at a prespecified day +100 landmark and cut-off.
+Reference standard: Not applicable — no independent gold standard; both MRD and PET assessed as index tests.
+Flow & timing: High — although both intended at day +100, substantial missing PET caused partial verification and potential flow bias.",,,,Fonseca R et al 2023,2025-08-23 16:22:48.571521,2025-08-23 16:22:48.571535
+Kraeber-BF et al.,2023,Manual,10.3324/haematol.2021.280051,,Prospective companion analysis (CASSIOPEIA),Haematologica,Prognostic value of PET/CT in transplant-eligible NDMM: the CASSIOPET study,268,184,184,59,"Newly Diagnosed MM, Transplant-eligible",4 cycles of pre-ASCT induction and 2 cycles of post-ASCT consolidation with D-VTd or VTd,Yes,Flow cytometry,1.00E-05,Post-consolidation (~day 100 after ASCT),,,Baseline,Post-consolidation (~day 100 after ASCT),Yes,"No, <30 Days window",Baseline,20.1,79.9,,Italian MM imaging criteria (IMPeTUs),67.2,,,,,,,,,,,,0.42,0.18-0.97,,,,,,,,,,,"QUIPS:
+Study participation: Moderate — PET sub-cohort derived from the parent RCT; imaging availability may have introduced mild selection.
+Study attrition: Low — baseline PET cohort analysed with adequate follow-up and near-complete outcome capture.
+Prognostic-factor measurement: Low — standardized PET/CT with central, blinded Deauville/IMPeTUs reading.
+Outcome measurement: Low — PFS definitions and adjudication per trial protocol.
+Confounding: Moderate — multivariable models adjusted for major prognostic factors, but limited events and subgroup imbalances may leave residual confounding.
+Statistical analysis & reporting: Moderate — prespecified Cox analysis; limited events-per-variable and exploratory emphasis.
+QUADAS-2:
+Patient selection: Some concerns — imaging performed in a subset of the RCT (potential selection bias).
+Index test (PET): Low — standardized acquisition, central blinded Deauville scoring per protocol.
+Reference standard: Not applicable — no diagnostic gold standard; prognostic PET substudy.
+Flow & timing: Low — uniform baseline imaging before therapy.
+Applicability: Low concerns — PET criteria and population align with routine clinical context.",,TRUE,NO,Kraeber BF et al 2023-CASSIOPET,2025-09-14 10:27:10.473901,2025-09-14 10:27:10.473901
+Hajiyianni M,2024,Manual,https://doi.org/10.1182/blood-2024-210171,,RCT,Blood,MRD By Flow Cytometry and FDG-PET/CT for the Post-Induction Response Assessment in Patients with Multiple Myeloma Treated in the Phase 3 GMMG HD7 Study,72,72,72,NA,"Newly Diagnosed MM, Transplant-eligible","isatuximab in addition to lenalidomide, bortezomib, and dexamethasone in patients with NDTEMM",Yes,Flow cytometry,1.00E-05,Post-induction,44,56,Baseline,Pre-Maintenance,Yes,Unknown,Post-induction,53,47,Yes,Italian MM imaging criteria (IMPeTUs),64,51,"I: 40 %, II: 43 %, III: 11 %, Not_Classifiable: 6 %",No,,,38,8,39,15,,,,,,,,,,,,,,,"QUIPS:
+Not applicable — cross-sectional PET/MRD concordance; no time-to-event outcomes.
+QUADAS-2:
+Patient selection: Some concerns — imaging substudy within an RCT; likely non-consecutive inclusion.
+Index test (PET): Some concerns — IMPeTUs/Deauville used, but blinding/central read not fully detailed.
+Index test (MRD/NGF): Some concerns — appropriate NGF, but assessor blinding/QA not specified.
+Reference standard: Not applicable — comparison of two index tests; no single gold standard.
+Flow & timing: Low — paired post-induction assessments within a uniform window.
+Applicability concerns: Moderate — transplant-eligible population, early post-induction timepoint.",Abstract. Imaging substudy of ongoing Trial.,FALSE,No,Hajiyianni M et al 2024,2025-05-28 12:55:53.94241,2025-05-28 12:55:54.94241
+Swain R.N.; et al.,2025,Manual,doi.org/10.31547/bct-2025-002,,Retrospective cohort,Blood Cell Therapy,Role of Composite Measurable Residual Disease Assessment with PET-CT and flow cytometry in Multiple Myeloma patients undergoing Autologous Transplant,106,82,82,NA,,,Yes,Flow cytometry,1.00E-05,pre-ASCT,,,,,Yes,Yes,pre-ASCT,,,Unclear,IMWG criteria (negativity per CMR definition),,,,,,,30.5,36.6,9.8,23.2,,,,,,,,,,,,,,,"QUIPS:
+Study participation: Some concerns — real-world ASCT cohort; paired-test requirement limits generalizability.
+Study attrition: Low — follow-up adequate; some missing PET/MRD pairs documented.
+Prognostic-factor measurement: Low — BM-MRD by validated flow (≈10__); PET per IMWG/Deauville.
+Outcome measurement: Low — TTNT/OS clearly defined and analyzed.
+Confounding: Some concerns — multivariable Cox reported, but treatment heterogeneity/residual confounding likely.
+Statistical analysis & reporting: Some concerns — limited assumption checks/sensitivity analyses stated.
+Overall QUIPS: Some concerns.
+QUADAS-2:
+Patient selection: Some concerns — retrospective ASCT cohort; paired-test inclusion.
+Index test (PET/CT): Some concerns — standardized criteria used, but reader blinding to MRD not explicit.
+Reference standard (BM-MRD by flow): Some concerns — threshold and blinding to PET not fully detailed.
+Flow & timing: Low — prespecified pre-ASCT and ~day +100 timepoints; short intervals, missingness reported.
+Overall QUADAS-2: Some concerns; applicability concerns Low–Moderate (ASCT, landmarked timepoints).",,,,Swain et al 2025,26.09.2025 09:52,26.09.2025 09:52
+"Talarico M,  Cattabriga A, Di Franco M, Solli V, Ghibellini S,  Sacchetti I, Manzato  E,  Masci S,  Restuccia R, Puppi M, Iezza M,  Rizzello I, Mancuso K, Pantani L,  Tacchetti P, Barbato S,  Terragna C,  Brocchi S,   Mosconi C,  Nanni C,  Fanti S,  Cavo M,  Zamagni E",2025,Manual,10.1016/S2152-2650(25)03423-8,,Prospective cohort,"Clinical Lymphoma, Myeloma and Leukemia","Prospective Evaluation of Response Assessment in Newly-Diagnosed Multiple Myeloma with Combined use of 18F-FDG-PET/CT, Whole-Body Diffusion-Weighted MRI and MRD by Next-Generation Sequencing",46,23,23,NA,,Re-evaluation before maintenance (ASCT) or +1 year (non-ASCT),,NGS,"1e-4, 1e-5",Re-evaluation (ASCT: pre-maintenance; non-ASCT: +1y),75,25,Baseline,Re-evaluation (ASCT: pre-maintenance; non-ASCT: +1y),Yes,Yes,Post-induction,95.8,4.2,,,,,,,,,75,0,20.8,4.2,,,,,,,,,,,,,,,"QUADAS-2:
+Patient selection: High — only baseline PET-positive patients underwent re-imaging, introducing spectrum restriction and partial verification bias.
+Index test (PET/CT): Unclear — working rule CMR = PET_ and PMR/stable/progression = PET_; not a prespecified standardized threshold.
+Reference standard (MRD by NGS): Unclear — negativity threshold (10__ vs 10__) not fixed at this timepoint.
+Flow & timing: High — paired assessments incomplete (MRD missing in several PET strata) although ±14-day window respected.
+Overall: Moderate risk of bias; applicability: Moderate concern.
+QUIPS:
+Study participation: Moderate–High — subset enriched for PET-positive baseline; limited representativeness.
+Study attrition: Moderate — several missing MRD/imaging pairs at re-evaluation; potential informative missingness.
+Prognostic-factor measurement (MRD/imaging): Moderate — MRD by NGS robust, but threshold not fixed; PET positivity rule preliminary.
+Outcome measurement: Unclear — no survival events, follow-up, or endpoint definitions for this paired cohort.
+Confounding: High — no adjusted analyses; ASCT eligibility, maintenance, age, and cytogenetics could confound results.
+Statistical analysis & reporting: Low — descriptive reporting only; no major analytic errors.
+Overall QUIPS: Moderate risk of bias.",PET/CT repeated only if baseline PET positive,,,Talarico et al 2025,05.10.2025 18:44,05.10.2025 18:44
