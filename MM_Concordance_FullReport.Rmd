@@ -20,21 +20,72 @@ header-includes: "<style>\n  h1.title {font-size: 28px; font-weight: 700;}\n  h1
   \ .tocify { font-size: 14px; }\n  .table caption {caption-side: top;}\n</style>\n"
 ---
 
+```{r flags-fh, echo=FALSE, message=FALSE, warning=FALSE}
+fh_table_ok <- FALSE
+
+# ST1 is only possible if we can find usable Study/a/b/c/d/n somewhere
+src <- NULL
+if (exists("tab2") && is.data.frame(tab2) && nrow(tab2) > 0) {
+  src <- tab2
+} else if (file.exists(file.path("tables","Table_2_Concordance_Augmented.csv"))) {
+  tmp <- try(readr::read_csv(file.path("tables","Table_2_Concordance_Augmented.csv"), show_col_types = FALSE),
+             silent = TRUE)
+  if (!inherits(tmp, "try-error")) src <- tmp
+} else if (exists("mrd") && is.data.frame(mrd) && nrow(mrd) > 0) {
+  src <- mrd
+}
+
+if (is.data.frame(src) && nrow(src) > 0) {
+  # normalize Unicode minus
+  names(src) <- gsub("−","-", names(src), fixed = TRUE)
+
+  pick <- function(nm, opts) nm[match(opts, nm, nomatch = 0L)][1]
+  nm <- names(src)
+
+  a_col <- pick(nm, c("a","MRD-/PET+","MRDneg_PETpos","MRDneg.PETpos","MRDneg_PET+","MRDneg.PET+"))
+  b_col <- pick(nm, c("b","MRD-/PET-","MRDneg_PETneg","MRDneg.PETneg","MRDneg_PET-","MRDneg.PET-"))
+  c_col <- pick(nm, c("c","MRD+/PET-","MRDpos_PETneg","MRDpos.PETneg","MRDpos_PET-","MRDpos.PET-"))
+  d_col <- pick(nm, c("d","MRD+/PET+","MRDpos_PETpos","MRDpos.PETpos","MRDpos_PET+","MRDpos.PET+"))
+  n_col <- pick(nm, c("n","N","total","Total"))
+  s_col <- pick(nm, c("Study","StudyShort","Authors","study","study_id","Title"))
+
+  needed <- c(s_col,a_col,b_col,c_col,d_col,n_col)
+
+  if (!any(is.na(needed))) {
+    df2 <- data.frame(
+      Study = as.character(src[[s_col]]),
+      a = suppressWarnings(as.numeric(src[[a_col]])),
+      b = suppressWarnings(as.numeric(src[[b_col]])),
+      c = suppressWarnings(as.numeric(src[[c_col]])),
+      d = suppressWarnings(as.numeric(src[[d_col]])),
+      n = suppressWarnings(as.numeric(src[[n_col]])),
+      stringsAsFactors = FALSE
+    )
+    df2 <- subset(df2, is.finite(a)&is.finite(b)&is.finite(c)&is.finite(d)&is.finite(n)&n>0)
+    fh_table_ok <- nrow(df2) > 0
+  }
+}
+
+# FH figure is produced from ST1 (in-memory or CSV), so same flag is fine
+fh_fig_ok <- fh_table_ok
+
+```
+
 
 # Overview & Summary
 
-Transparent, fully reproducible rebuild of the MRD–PET/CT agreement and prognosis analysis using paired 2×2 data. All inputs are harmonised to canonical cell counts (a = MRD−/PET+, b = MRD−/PET−, c = MRD+/PET−, d = MRD+/PET+) with percentages back-calculated to counts by proportional allocation and reconciled to the reported cohort size (n).
+Transparent, fully reproducible rebuild of the MRD–PET/CT agreement and prognosis analysis using paired 2×2 data. All inputs are harmonised to canonical cell counts (a = MRD−/PET+, b = MRD−/PET−, c = MRD+/PET−, d = MRD+/PET+) with percentages back-calculated to counts by proportional allocation and reconciled to the reported cohort size (n), where needed.
 
-Analysis sets: (i) Primary (MRD and PET/CT at the same time-point); (ii) Strict (Δ ≤ 30 days between MRD and PET/CT); (iii) Sensitivity (including reconstructed rows and prespecified exclusions).
+Analysis sets: (i) Primary (MRD and PET/CT assessed at the same time point); (ii) Strict (Δ ≤ 30 days between MRD and PET/CT); (iii) Sensitivity (including reconstructed rows and prespecified exclusions).
+Agreement metrics: Per study we report the pooled concordant proportion (b+d)/n, Cohen’s κ (standard error and 95% confidence interval), McNemar mid-p, and Gwet’s AC1 and prevalence- and bias-adjusted κ (PABAK). Study-level κ is pooled using random-effects (restricted maximum likelihood) with Knapp–Hartung adjustment. Directional discordance is defined as log-odds(MRD−/PET+ vs MRD+/PET−) with Haldane–Anscombe correction and synthesised by random-effects meta-analysis; 95% prediction intervals are reported when estimable.
 
-Agreement metrics: Per study we report the concordant proportion (b+d)/n, Cohen’s κ (standard error and 95% confidence interval), McNemar mid-p, and Gwet’s AC1 and prevalence- and bias-adjusted κ (PABAK). Study-level κ is pooled using random-effects (restricted maximum likelihood) with Knapp–Hartung adjustment. Directional discordance is defined as log-odds(MRD−/PET+ vs MRD+/PET−) with Haldane–Anscombe correction and synthesised by random-effects meta-analysis; 95% prediction intervals are reported when estimable.
+Fréchet–Hoeffding κ bounds: Identification regions are derived per study and for pooled marginals. In this build, bounds are presented graphically (Supplementary Methods/figure), whereas the corresponding summary table may be omitted if inputs are insufficient for tabulation; bounds frequently cross zero, indicating weak identifiability of κ and supporting cautious interpretation and a complementary view of MRD and PET/CT.
 
-Fréchet–Hoeffding κ bounds: Identification regions are derived per study and for the pooled marginals, with bounds frequently crossing zero, indicating weak identifiability of κ and supporting cautious interpretation and a complementary view of MRD and PET/CT.
+Survival (progression-free survival, PFS): Dual-negative (MRD−/PET−) versus all other response categories. Hazard ratios (HR) are pooled using random-effects (restricted maximum likelihood) with Knapp–Hartung, yielding a pooled HR of 0.33 (95% CI 0.24–0.45) favouring dual-negative versus others. Small-study asymmetry tests are interpreted descriptively given the limited number of cohorts.
 
-Survival (progression-free survival, PFS): Dual-negative (MRD−/PET−) versus all other response categories. Hazard ratios (HR) are pooled using random-effects (restricted maximum likelihood) with Knapp–Hartung, yielding a pooled HR of 0.33 (95% CI 0.24–0.45) for dual-negative versus others; small-study asymmetry tests are interpreted descriptively given the low number of cohorts.
-Primary pooled matrix (same-time-point set): a = 435 (37.4%), b = 374 (32.1%), c = 304 (26.1%), d = 51 (4.4%); n = 1,164; pooled concordant proportion = 36.5% and pooled κ = −0.26 (95% CI −0.31 to −0.21).
+Primary pooled 2×2 matrix (same-time-point set): MRD−/PET− 32.1% (n=374), MRD−/PET+ 37.4% (n=435), MRD+/PET− 26.1% (n=304), MRD+/PET+ 4.4% (n=51); analyzable paired n=1,164. Pooled concordant proportion = 36.5% and pooled κ = −0.26 (95% CI −0.31 to −0.21).
 
-Key outputs: Table 1 (study characteristics); Table 2 (concordance and directional discordance); Figure 2A (pooled κ forest plot); Figure 2B (directional discordance meta-analysis); Figure 3A (PFS meta-analysis); Supplementary Figure SF1 (pooled 2×2 matrix); Supplementary Tables ST1–ST2 (Fréchet–Hoeffding bounds and risk-of-bias).
+Key outputs: Table 1 (study characteristics); Table 2 (concordance and directional discordance); Figure 1 (PRISMA diagram); Figure 2A (pooled κ forest plot); Figure 2B (directional discordance meta-analysis); Figure 3A (PFS meta-analysis); Figure 3B (funnel plot); Supplementary Figure SF1 (pooled 2×2 matrix); Supplementary Tables ST1–ST2 (Fréchet–Hoeffding bounds and risk-of-bias). Optional supplementary outputs (simulation and decision-curve analysis) are omitted when required inputs are unavailable.
 
 
 ```{r setup-boot, include=FALSE}
@@ -268,15 +319,13 @@ fit_rma <- function(d) metafor::rma(yi = d$yi, vi = d$vi, method = "REML", test 
 # Optional helper sourcing
 source_once(here::here("R","utils_io.R"))
 source_once(here::here("R","lancet_upgrades.R"))
-source_once(here::here("R","utils_filters.R"))
 source_once(here::here("R","utils_concordance.R"))
 source_once(here::here("R","survival_utils.R"))
 source_once(here::here("R","figures.R"))
 source_once(here::here("R","tables.R"))
 source_once(here::here("R","meta_diagnostics.R"))
 source_once(here::here("R","prisma.R"))
-#source_once(here::here("R","make_journal_outputs.R"))
-#source_once(here::here("R", "post-hoc-sensitivity.R"))
+
 
 
 # Legends (single source of truth)
@@ -499,9 +548,6 @@ source_if("patch_mrd_pipeline.R")
 source_if(here::here("patch_mrd_pipeline.R"))
 source_if("R/patch_mrd_pipeline.R")
 source_if(here::here("R","patch_mrd_pipeline.R"))
-
-source_if("R/compat_harmonize_mrd.R")
-source_if(here::here("R","compat_harmonize_mrd.R"))
 
 source_if("R/utils_concordance.R")
 source_if(here::here("R","utils_concordance.R"))
@@ -733,16 +779,16 @@ reasons_fulltext_tbl <- tibble::tibble(
 
 
 PRISMA_OVERRIDE <- list(
-  identified       = 112,
-  auto_excluded    = 51,
+  identified       = 111,
+  auto_excluded    = 50,
   screened         = 61,
-  excl_title_abs   = 42,
-  sought           = 19,
+  excl_title_abs   = 40,
+  sought           = 21,
   not_retrieved    = 0,
   full_text        = 23,
   excl_full_text   = 13,
   included         = 10,
-  manual           = 4,
+  manual           = 2,
   reasons_screening = reasons_screening_tbl,
   reasons_fulltext  = reasons_fulltext_tbl
 )
@@ -929,19 +975,28 @@ if (is.null(`%||%`)) `%||%` <- function(a, b) if (is.null(a) || !length(a) || al
 
 # 1) Path resolution
 mrd_path_candidates <- c(
+  file.path("data", "mrd_petct_data.csv"),   
+  "mrd_petct_data.csv",
   here::here("data","mrd_petct_data.csv"),
   here::here("mrd_petct_data.csv"),
-  Sys.getenv("MRDPET_CSV",""),
+  Sys.getenv("MRDPET_CSV"),
   "/mnt/data/mrd_petct_data.csv"
 )
-mrd_path_candidates <- mrd_path_candidates[nzchar(mrd_path_candidates)]
+
+# drop NA and empty strings safely
+mrd_path_candidates <- mrd_path_candidates[!is.na(mrd_path_candidates) & nzchar(mrd_path_candidates)]
+
 exists_vec <- vapply(mrd_path_candidates, file.exists, logical(1))
+
 if (!any(exists_vec)) {
-  knitr::asis_output("<em>mrd_petct_data.csv not found in expected locations. Set env <code>MRDPET_CSV</code> or place file in <code>data/</code>.</em>")
-  
+  knitr::asis_output(
+    "<em>mrd_petct_data.csv not found. Put it in <code>data/</code> or set env <code>MRDPET_CSV</code>.</em>"
+  )
   knitr::knit_exit()
 }
+
 mrd_path <- mrd_path_candidates[which(exists_vec)[1]]
+
 
 # 2) Robust CSV reader with encoding fallback (why: user file may be latin-1)
 read_csv_flex <- function(path, ...) {
@@ -958,13 +1013,27 @@ read_csv_flex <- function(path, ...) {
   stop("Could not read CSV with encodings ", paste(encs, collapse = "/"), call. = FALSE)
 }
 
+mrd_path <- file.path("data", "mrd_petct_data.csv")
+stopifnot(file.exists(mrd_path))
+
 # 3) Load and harmonize
-mrd <- if (exists("safe_read_csv")) try(safe_read_csv(mrd_path), silent = TRUE) else NULL
-if (inherits(mrd, "try-error") || is.null(mrd)) mrd <- read_csv_flex(mrd_path)
+mrd <- NULL
+
+if (!is.na(mrd_path) && nzchar(mrd_path) && file.exists(mrd_path) && exists("safe_read_csv")) {
+  mrd <- try(safe_read_csv(mrd_path), silent = TRUE)
+  if (inherits(mrd, "try-error")) mrd <- NULL
+}
+
+if (is.null(mrd)) {
+  mrd <- read_csv_flex(mrd_path)  # already clean_names()
+}
+
+if (is.null(mrd) || !is.data.frame(mrd)) stop("MRD table not loaded (mrd is NULL).", call. = FALSE)
+
 if (exists("harmonize_mrd_schema")) {
   mrd <- tryCatch(harmonize_mrd_schema(mrd), error = function(e) mrd)
 }
-mrd <- janitor::clean_names(mrd)
+
 
 # 4) Ensure core columns exist and are numeric
 need_cols <- c("a","b","c","d","n")
@@ -1510,12 +1579,19 @@ stopifnot(exists("mrd"), is.data.frame(mrd))
   }
   NULL
 }
-.num <- function(x) suppressWarnings(as.numeric(x))
+.num <- function(x) {
+  x <- enc2utf8(as.character(x))
+  x <- gsub("\u00b7", ".", x, fixed = TRUE)  # 0·33 -> 0.33
+  x <- gsub(",", ".", x, fixed = TRUE)
+  suppressWarnings(as.numeric(x))
+}
 
 # Robust parser for CI strings like "0.23–0.88", "0.23 - 0.88", or "95% CI 0.23 to 0.88"
 .parse_ci <- function(s) {
   if (is.null(s) || !length(s)) return(c(NA_real_, NA_real_))
   s <- enc2utf8(as.character(s))
+  s <- gsub("\u00b7", ".", s, fixed = TRUE)   # 0·23–0·88 -> 0.23–0.88
+
 
   # Clean text safely (PCRE), escaping all bracket chars
   s <- gsub("\\s*\\(.*?\\)", " ", s, perl = TRUE)                            
@@ -1583,6 +1659,7 @@ SE_from_str    <- ifelse(with_str_rng, (log(tmp$HI_s)-log(tmp$LO_s))/(2*1.96), N
 
 surv_df <- tibble::tibble(
   Study = tmp$Study,
+  tmp$Study[is.na(tmp$Study) | !nzchar(tmp$Study)] <- sprintf("Study_%02d", seq_len(nrow(tmp))),
   logHR = dplyr::coalesce(tmp$logHR_d, logHR_from_num, logHR_from_str),
   SE    = dplyr::coalesce(tmp$SE_d,    SE_from_num,    SE_from_str)
 ) %>%
@@ -1858,17 +1935,25 @@ if (ok && file.exists(fig_png) && requireNamespace("magick", quietly = TRUE)) {
   }, silent = TRUE)
 }
 
-# Display priority: PDF → PNG widget → html
-if (file.exists(fig_pdf)) {
-  knitr::include_graphics(fig_pdf)
-} else if (file.exists(fig_png)) {
-  knitr::include_graphics(fig_png)
-} else if (file.exists(fig_html) && knitr::is_html_output()) {
-  htmltools::htmlDependency("") # noop to ensure htmltools loaded
-  cat(htmltools::renderTags(htmltools::includeHTML(fig_html))$html)
+# Display priority: HTML -> PNG (best), PDF only for LaTeX/PDF output
+if (knitr::is_html_output()) {
+  if (file.exists(fig_png)) {
+    knitr::include_graphics(fig_png)
+  } else if (file.exists(fig_html)) {
+    cat(htmltools::renderTags(htmltools::includeHTML(fig_html))$html)
+  } else {
+    knitr::asis_output("<em>PRISMA counts unavailable — figure skipped.</em>")
+  }
 } else {
-  knitr::asis_output("<em>PRISMA counts unavailable — figure skipped.</em>")
+  if (file.exists(fig_pdf)) {
+    knitr::include_graphics(fig_pdf)
+  } else if (file.exists(fig_png)) {
+    knitr::include_graphics(fig_png)
+  } else {
+    knitr::asis_output("<em>PRISMA counts unavailable — figure skipped.</em>")
+  }
 }
+
 
 
 ```
@@ -1969,7 +2054,6 @@ if (is.null(nr) || nr == 0) {
   }
   sim_flag <- norm_yesno(sim_raw)
 
-  # ----------------- HR available (from survival meta-analysis input) -----------------
 # ----------------- HR available (directly from mrd) -----------------
 # accepts any of these: pfs_dual_neg (HR), pfs_dual_neg_ci (CI string), pfs_hr, hr
 get1 <- function(...) {
@@ -2380,7 +2464,7 @@ htmltools::tags$div(
 ```
 
 ## Fréchet–Hoeffding bounds
-```{r frechet-bounds, echo=FALSE, message=FALSE, warning=FALSE, results='asis', eval=FALSE}
+```{r frechet-bounds, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, results='asis'}
 # 1) Pick a concordance-ready source (prefer mrd_conc; fallback to mrd)
 src <- if (exists("mrd_conc") && is.data.frame(mrd_conc) && nrow(mrd_conc) > 0) mrd_conc else mrd
 stopifnot(is.data.frame(src))
@@ -2460,7 +2544,9 @@ if (!nrow(df0)) {
     K_point= round(K_point, 3),
     K_low  = round(K_low, 3),
     K_high = round(K_high, 3),
-    Width  = round(Width, 3)
+    Width  = round(Width, 3),
+    po_min  = round(po_min, 4),
+    po_max  = round(po_max, 4)
   )
 
   # 5) Print + persist -----------------------------------------------------------
@@ -2952,6 +3038,53 @@ if (!exists("mrd2x2") || !is.data.frame(mrd2x2) || nrow(mrd2x2) == 0) {
   }
 }
 
+# 5) Create FH-bounds figure file if missing (from mrd_primary)
+make_fh_fig <- function(df, out = here::here("figs","Supplementary Methods S4-Kappa FH bounds.png")){
+  if (!has_cols(df, c("a","b","c","d","n"))) return(FALSE)
+  a<-num(df$a); b<-num(df$b); c<-num(df$c); d<-num(df$d); n<-num(df$n)
+  ok <- is.finite(a)&is.finite(b)&is.finite(c)&is.finite(d)&is.finite(n)&n>0
+  if (!any(ok)) return(FALSE)
+  df <- df[ok, , drop=FALSE]
+  # labels
+  labcol <- intersect(c("Study","StudyShort","study","study_id","id","authors","title"), names(df))
+  lab <- if (length(labcol)) as.character(df[[labcol[1]]]) else paste0("Study_", seq_len(nrow(df)))
+  # point kappa
+  po <- (df$b + df$d)/df$n
+  pe <- ((df$a+df$b)/df$n)*((df$a+df$c)/df$n) + ((df$c+df$d)/df$n)*((df$b+df$d)/df$n)
+  k_point <- ifelse(is.finite(pe) & (1-pe)>0, (po - pe)/(1 - pe), NA_real_)
+  # FH bounds from marginals
+  r1 <- df$a + df$b; c1 <- df$b + df$c; r2 <- df$n - r1; c2 <- df$n - c1
+  bmin <- pmax(0, r1 - c2, c1 - (df$n - r1))
+  bmax <- pmin(r1, c1)
+  build_k <- function(bst, i){
+    d_star <- r2[i] - (c2[i] - bst)
+    a_star <- r1[i] - bst
+    c_star <- c1[i] - bst
+    po <- (bst + d_star)/df$n[i]
+    pe <- (r1[i]/df$n[i])*(c1[i]/df$n[i]) + (r2[i]/df$n[i])*(c2[i]/df$n[i])
+    if (!is.finite(pe) || (1-pe)<=0) return(NA_real_)
+    (po - pe)/(1 - pe)
+  }
+  k_low  <- mapply(build_k, bmin, seq_along(bmin))
+  k_high <- mapply(build_k, bmax, seq_along(bmax))
+  dplot <- tibble::tibble(Study = lab, K_low = k_low, K_high = k_high, K_point = k_point)
+  # plot
+  dir.create(dirname(out), showWarnings = FALSE, recursive = TRUE)
+  suppressPackageStartupMessages(library(ggplot2))
+  p <- ggplot2::ggplot(dplot, ggplot2::aes(y = reorder(Study, K_point), x = K_point)) +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmin = K_low, xmax = K_high), height = 0.22, alpha = 0.9) +
+    ggplot2::geom_point() +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dotted") +
+    ggplot2::labs(title = "κ identification intervals (FH bounds) with point estimate",
+         x = "Cohen’s κ", y = NULL) +
+    ggplot2::theme_minimal(base_size = 11)
+  ggplot2::ggsave(out, p, width = 7.8, height = 0.5 * nrow(dplot) + 2.0, dpi = 300, bg = "white")
+  file.exists(out)
+}
+fh_png <- here::here("figs","Supplementary Methods S4-Kappa FH bounds.png")
+if (!file.exists(fh_png) && is.data.frame(mrd_primary) && nrow(mrd_primary) > 0) {
+  invisible(try(make_fh_fig(mrd_primary, fh_png), silent = TRUE))
+}
 
 ```
 
@@ -2964,8 +3097,9 @@ suppressPackageStartupMessages({
   library(dplyr); library(readxl); library(stringr); library(ggplot2); library(metafor)
 })
 
-data_path <- if (file.exists("tables/Table_2_Concordance_Augmented.xlsx"))
-  "tables/Table_2_Concordance_Augmented.xlsx" else "Table_2_Concordance_Augmented.xlsx"
+data_path <- normalizePath(file.path("tables", "Table_2_Concordance_Augmented.xlsx"))
+tab <- readxl::read_xlsx(data_path, sheet = 1, .name_repair = "minimal")
+
 
 # ---------- helpers ----------
 norm_name <- function(x){
@@ -3137,8 +3271,15 @@ pr <- try(metafor::predict(fit_k), silent = TRUE)
 
   # --- forest (Lancet-style) ---
     xlim    <- c(-1.4, 1.4); x_left <- -1.15; x_right <- 1.35
-    
-p <- ggplot(df_k, aes(y = row_id)) + geom_errorbarh(aes(xmin = k_lo, xmax = k_hi), height = 0.18, linewidth = 0.5) +
+  
+pi_ok <- !inherits(pr,"try-error") && all(is.finite(c(pr$pi.lb, pr$pi.ub)))
+
+p <- ggplot(df_k, aes(y = row_id)) + 
+  { if (pi_ok)
+      geom_rect(aes(xmin = pr$pi.lb, xmax = pr$pi.ub, ymin = -Inf, ymax = Inf),
+                inherit.aes = FALSE, fill = "grey90", alpha = 0.25)
+    } +
+geom_errorbarh(aes(xmin = k_lo, xmax = k_hi), height = 0.18, linewidth = 0.5) +
       geom_point(aes(x = Kappa, size = w_pct), shape = 22, stroke = 0.3, fill = "black") +
       scale_size(range = c(1.8, 6.0), guide = "none") +
       geom_vline(xintercept = 0, linetype = "dashed", linewidth = 0.4) +
@@ -3371,17 +3512,12 @@ pool_row <- function(df){
   c <- sum(suppressWarnings(as.numeric(df$c)), na.rm=TRUE)
   d <- sum(suppressWarnings(as.numeric(df$d)), na.rm=TRUE)
   n <- a+b+c+d
-  tibble(a=a, b=b, c=c, d=d, N=n, agree = if (n>0) (b+d)/n else NA_real_)
+  tibble(a=a, b=b, d=d, c=c, N=n, agree = if (n>0) (b+d)/n else NA_real_)
 }
 
-# Pooled joint MRD × PET-CT counts (final analytic set)
-raw_out <- tibble::tribble(
-  ~Dataset,          ~a,  ~b,  ~c,  ~d,   ~N,
-  "PRIMARY",         145, 499, 310, 184, 1138,
-  "STRICT TIMEPOINT",127, 370, 166, 227,  890
-) %>%
-  dplyr::mutate(agree = (b + d) / N) %>%
-  dplyr::select(Dataset, a, b, d, c, N, agree)  # keep same column order as before
+r_primary <- pool_row(mrd_primary) %>% mutate(Dataset="PRIMARY")
+r_strict  <- if (!inherits(mrd_primary_strict,"try-error") && is.data.frame(mrd_primary_strict) && nrow(mrd_primary_strict)) pool_row(mrd_primary_strict) %>% mutate(Dataset="STRICT TIMEPOINT") else NULL
+raw_out   <- bind_rows(r_primary, r_strict) %>% select(Dataset, a, b, d, c, N, agree)
 
 # Write pooled 2x2 table (PRIMARY vs STRICT)
 if (requireNamespace("here", quietly = TRUE)) dir.create(here::here("tables"), TRUE, TRUE)
@@ -3926,9 +4062,9 @@ if (exists("is_df") && is_df(fh_tbl) || (is.data.frame(fh_tbl) && nrow(fh_tbl) >
   } else {
     knitr::kable(fh_tbl, caption = "Study influence & heterogeneity contributions (active analysis)")
   }
-} else {
-  note("fh_tbl not created: no active meta-analysis object available at this point.")
-}
+} #else {
+  #note("fh_tbl not created: no active meta-analysis object available at this point.")
+#}
 
 ```
 
@@ -4100,6 +4236,7 @@ if (exists("mrd_primary_strict") && is.data.frame(mrd_primary_strict)) {
 
 
 # Survival & meta-analysis
+
 ## PFS Dual-negative vs others
 ```{r surv-check, echo=FALSE}
 if (exists("surv_df") && is.data.frame(surv_df) && nrow(surv_df) > 0) {
@@ -4246,35 +4383,55 @@ if (exists("surv_df") && is.data.frame(surv_df) && nrow(surv_df) >= 2 &&
 
 
 ## PFS pooled summary
-```{r pfs-pooled-summary, echo=FALSE, results='asis', cache=FALSE}
+```{r pfs-pooled-summary, echo=FALSE, cache=FALSE, results='asis'}
 if (exists("surv_df") && is.data.frame(surv_df) && nrow(surv_df) >= 2) {
-  fit <- metafor::rma(yi=surv_df$logHR, sei=surv_df$SE, method="REML", test="knha")
-  pr  <- try(metafor::predict(fit, transf=exp), silent=TRUE)
+
+  fit <- metafor::rma(yi = surv_df$logHR, sei = surv_df$SE, method = "REML", test = "knha")
+
+  # manual 95% prediction interval on HR scale
+  mu_hat <- as.numeric(fit$b)
+  se_mu  <- as.numeric(fit$se)
+  tau2   <- as.numeric(fit$tau2)
+
+  pred_se <- sqrt(se_mu^2 + tau2)
+  crit    <- qt(0.975, df = fit$k - 1)  # conservative small-k
+  pi_lb   <- exp(mu_hat - crit * pred_se)
+  pi_ub   <- exp(mu_hat + crit * pred_se)
+  pi_str  <- sprintf("%.2f–%.2f", pi_lb, pi_ub)
+
   out <- tibble::tibble(
-    Model="REML (Knapp–Hartung)", k=nrow(surv_df),
-    `HR (95% CI)`=sprintf("%.2f (%.2f–%.2f)", exp(as.numeric(fit$b)), exp(fit$ci.lb), exp(fit$ci.ub)),
-    `Prediction interval (HR)`=if (!inherits(pr,"try-error")) sprintf("%.2f–%.2f", pr$pi.lb, pr$pi.ub) else "—",
-    `τ²`=fit$tau2, `I² (%)`=fit$I2
+    Model = "REML (Knapp–Hartung)",
+    k = nrow(surv_df),
+    `HR (95% CI)` = sprintf("%.2f (%.2f–%.2f)",
+                            exp(as.numeric(fit$b)), exp(fit$ci.lb), exp(fit$ci.ub)),
+    `Prediction interval (HR)` = pi_str,
+    `τ²` = fit$tau2,
+    `I² (%)` = fit$I2
   )
-  if (knitr::is_html_output() && requireNamespace("gt", quietly=TRUE)) {
+
+  if (knitr::is_html_output() && requireNamespace("gt", quietly = TRUE)) {
     tbl <- gt::gt(out) |>
-      gt::fmt_number(columns=c(`τ²`,`I² (%)`), decimals=2) |>
-      gt::cols_align("center", columns=gt::everything()) |>
+      gt::fmt_number(columns = c(`τ²`, `I² (%)`), decimals = 2) |>
+      gt::cols_align("center", columns = gt::everything()) |>
       gt::tab_header(
-        title=gt::md("**PFS pooled summary (dual-negative vs all others)**"),
-        subtitle=gt::md("Random-effects REML with Knapp–Hartung. Values < 1 favor dual-negative.")
+        title = gt::md("**PFS pooled summary (dual-negative vs all others)**"),
+        subtitle = gt::md("Random-effects REML with Knapp–Hartung. Values < 1 favor dual-negative.")
       ) |>
       gt::tab_source_note(gt::md("Small-study asymmetry tests have low power when *k* < 10; interpret cautiously."))
+
     knitr::asis_output(gt::as_raw_html(tbl))
-    invisible(NULL)
   } else {
-    print(knitr::kable(out, digits=2,
-      caption="PFS pooled summary (dual-negative vs all others): REML + Knapp–Hartung."))
+    knitr::kable(out, digits = 2,
+                 caption = "PFS pooled summary (dual-negative vs all others): REML + Knapp–Hartung.")
   }
+
+} else {
+  knitr::asis_output("<em>PFS pooled summary not available: surv_df missing or k&lt;2.</em>")
 }
 
 
 ```
+
 
 
 
@@ -4288,6 +4445,15 @@ if (!exists("res_hr") || !inherits(res_hr, "rma.uni")) {
   res_hr <- metafor::rma(yi = surv_df$logHR, vi = surv_df$vi, method = "REML", test = "knha")
 }
 mu <- as.numeric(res_hr$b)
+
+egger_p <- NA_real_
+if (nrow(surv_df) >= 3) {
+  eg <- metafor::regtest(res_hr, model = "rma")
+  egger_p <- eg$pval
+}
+egger_lab <- if (is.finite(egger_p)) sprintf("Egger p = %.3f", egger_p) else "Egger p = NA"
+# --------------------------------------------
+
 
 # Limits from data to include ALL studies
 x_min <- min(surv_df$logHR, na.rm = TRUE) - 0.15
@@ -4304,10 +4470,12 @@ p_fun <- ggplot(surv_df, aes(x = logHR, y = SE)) +
   geom_vline(xintercept = mu, linetype = "dashed") +
   geom_point(size = 2.5) +
   ggrepel::geom_label_repel(aes(label = StudyShort),
-                            size = 3, label.size = 0.25, label.r = unit(0.08, "lines"),
+                            size = 3, label.size = 0.25,
+                            label.r = grid::unit(0.08, "lines"),  # <- change unit() -> grid::unit()
                             min.segment.length = 0, seed = 1234) +
-  coord_cartesian(xlim = c(x_min, x_max), ylim = c(0, y_max), expand = FALSE) +
-  labs(x = "log(HR)", y = "SE", title = "B. Funnel plot (log(HR) vs SE)") +
+coord_cartesian(xlim = c(x_min, x_max), expand = FALSE) +
+  labs(x = "log(HR)", y = "SE", title = "Funnel plot (log(HR) vs SE)") +
+annotate("text", x = x_max, y = y_max, hjust = 1.1, vjust = -0.5, label = egger_lab, size = 3) +
   theme_minimal(base_size = 11) +
   theme(panel.grid.minor = element_blank(),
         plot.title = element_text(hjust = 0.5))
@@ -4567,6 +4735,8 @@ if (k >= 3) {
                            Egger_p=if (inherits(eg,"try-error")) NA_real_ else as.numeric(eg$pval))
   .show_tbl(eg_tab, sprintf("ST2: Egger summary — %s", lab))
   if (k < 10) note("Egger’s test has low power for k < 10; interpret with caution.")
+  
+  
 } else note("Egger not performed (k < 3).")
 
 # Leave-one-out
@@ -5402,24 +5572,8 @@ if (exists("mr_tbl")        && is.data.frame(mr_tbl)        && nrow(mr_tbl))    
 ov_quips    <- if (nrow(rob_quips_overall))  rob_quips_overall  else tibble::tibble(study_id=character(), quips_overall=character())
 ov_quadas   <- if (nrow(rob_quadas_overall)) rob_quadas_overall else tibble::tibble(study_id=character(), quadas_overall=character())
 rob_overall <- dplyr::full_join(ov_quips, ov_quadas, by = "study_id")
-
-
-if (!exists("search_sheet")) {
-  search_sheet <- tibble::tibble(
-    database = c(
-      "MEDLINE (via PubMed)",
-      "Cochrane CENTRAL",
-      "Other sources"
-    ),
-    notes = c(
-      "See Supplementary Methods S1 for full MEDLINE strategy.",
-      "See Supplementary Methods S1 for full CENTRAL strategy.",
-      "Other sources / handsearching; see Supplementary Methods S2."
-    )
-  )
-}
-
-
+if (!exists("search_sheet")) search_sheet <- tibble::tibble(database=c("MEDLINE","Cochrane","Others"),
+                                                            strategy=c("[Add final MEDLINE query]","[Add Cochrane query]","[Add other sources]"))
 
 
 if (!exists("prisma_sheet")) {
@@ -5533,23 +5687,27 @@ if (exists("MASTER")) {
   MASTER <- dplyr::select(MASTER, -dplyr::any_of("Search Strategy Notes"))
 }
 
-# Legacy splits (disabled –  now only use the MASTER workbook)
-if (FALSE && requireNamespace("writexl", quietly = TRUE)) {
+# Legacy splits (only if writexl present)
+if (requireNamespace("writexl", quietly = TRUE)) {
   st3_path <- here::here("tables","Supplementary_Table_ST3_Survival_and_Meta.xlsx")
   st4_path <- here::here("tables","Supplementary_Table_ST4_Methods_Checklists.xlsx")
   if (length(sheets3)) writexl::write_xlsx(sanitize_sheet_names(lapply(sheets3, round_df3)), st3_path)
   writexl::write_xlsx(sanitize_sheet_names(lapply(sheets4, round_df3)), st4_path)
 
+  # Links (HTML)
   if (knitr::is_html_output()) {
     knitr::asis_output('
-    <style>.dl-btn{display:inline-block;padding:.45em .8em;margin:.2em;border-radius:4px;border:1px solid #ccc;background:#f7f7f7;color:#111}.dl-btn:hover{background:#eee}</style>')
+    <style>.dl-btn{display:inline-block;padding:.45em .8em;border:1px solid #ddd;border-radius:8px;text-decoration:none;font-weight:600;font-size:.95em;background:#f7f7f7;color:#111}.dl-btn:hover{background:#eee}</style>')
     knitr::asis_output(sprintf(
-      '<p><a class="dl-btn" href="%s" download>Download MASTER (xlsx)</a></p>',
-      file.path("tables", "Supplementary_Tables_MASTER.xlsx")
+      '<p><a class="dl-btn" href="%s" download>Download MASTER (xlsx)</a>
+          <a class="dl-btn" href="%s" download>ST3 (xlsx)</a>
+          <a class="dl-btn" href="%s" download>ST4 (xlsx)</a></p>',
+      file.path("tables", "Supplementary_Tables_MASTER.xlsx"),
+      file.path("tables", "Supplementary_Table_ST3_Survival_and_Meta.xlsx"),
+      file.path("tables", "Supplementary_Table_ST4_Methods_Checklists.xlsx")
     ))
   }
 }
-
 
 ```
 
