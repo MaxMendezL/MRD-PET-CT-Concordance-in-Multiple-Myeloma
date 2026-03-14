@@ -28,8 +28,6 @@ r
    
 3. Open and knit the Multiple Myeloma Concordance.Rmd file.
 
-3. Knit the MM_Concordance_FullReport.Rmd file.
-
 
 ## Analysis overview
 The analytical workflow reconstructs paired 2×2 MRD/PET–CT contingency tables from published studies using the canonical ordering:
