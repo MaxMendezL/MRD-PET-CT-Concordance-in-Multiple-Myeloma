@@ -55,6 +55,7 @@ No individual patient-level data are included.
 ## Reproducibility
 The analytical workflow follows PRISMA 2020 reporting standards and the preregistered study protocol available on the Open Science Framework (OSF):
 https://doi.org/10.17605/OSF.IO/3CH9E
+See: https://archive.org/details/osf-registrations-3ch9e-v1
 
 ## Contact
 Max Mendez-Lopez  
