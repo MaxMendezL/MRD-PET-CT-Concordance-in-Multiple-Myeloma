@@ -63,3 +63,9 @@ Department of Medical Oncology / Haematology
 HOCH Ostschweiz, St Gallen, Switzerland  
 Email: Max.MendezLopez@h-och.ch
 
+## Citation
+Please cite the associated publication:
+Mendez-Lopez M, Talarico M, Driessen C. Minimal concordance but complementary prognostic value of bone–marrow minimal residual disease and PET–CT in multiple myeloma: a systematic review and meta-analysis. eClinicalMedicine. 2026.
+
+Repository:
+https://github.com/MaxMendezL/MRD-PET-CT-Concordance-in-Multiple-Myeloma
