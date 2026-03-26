@@ -1,9 +1,9 @@
 # ==============================================
-# File: R/utils_io.R
+# R/utils_io.R
 # ==============================================
 
-# Minimal IO helpers and directory bootstrap.
-# -------- shared helpers ------------------------------------------------------
+# Basic input/output helpers
+# shared helpers
 if (!exists("%||%")) {
   `%||%` <- function(a, b) {
     if (is.null(a)) return(b)
@@ -30,7 +30,7 @@ dir_setup <- function(root = ".") {
   invisible(dirs)
 }
 
-# -------- UTF-8 normalisation -------------------------------------------------
+# UTF-8 normalisation
 .normalize_utf8 <- function(x) {
   if (is.null(x)) return("")
   x  <- as.character(x)
@@ -44,7 +44,7 @@ trySuppress <- function(expr) {
   try(suppressWarnings(suppressMessages(force(expr))), silent = TRUE)
 }
 
-# -------- CSV reader with sniffing -------------------------------------------
+# Read CSV
 safe_read_csv <- function(path,
                           na = c("", "NA", "NaN", "null", "NULL", "#N/A"),
                           guess_max = 10000,
@@ -86,7 +86,7 @@ safe_read_csv <- function(path,
   df
 }
 
-# -------- XLSX reader ---------------------------------------------------------
+# Read XLSX 
 safe_read_xlsx <- function(path, sheet = 1,
                            na = c("", "NA", "NaN", "null", "NULL", "#N/A"),
                            col_types = NULL) {
@@ -114,7 +114,7 @@ safe_read_xlsx <- function(path, sheet = 1,
   df
 }
 
-# -------- Bundle inputs -------------------------------------------------------
+# Bundle inputs 
 read_all_inputs <- function(mrd_path, screen_path, meta_extra_path = NULL, ...) {
   mrd <- safe_read_csv(mrd_path, ...)
   screen <- if (!is.null(screen_path) && file.exists(screen_path)) safe_read_xlsx(screen_path, ...) else NULL
@@ -122,7 +122,7 @@ read_all_inputs <- function(mrd_path, screen_path, meta_extra_path = NULL, ...) 
   list(mrd = mrd, screen = screen, meta_extra = meta_extra)
 }
 
-# -------- Safe writers --------------------------------------------------------
+#  Safe writers 
 safe_write_csv <- function(df, path, na = "") {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
   readr::write_excel_csv(df, file = path, na = na)  # Excel-friendly UTF-8 BOM
@@ -160,7 +160,7 @@ show_png <- function(dir, file = NULL, caption = NULL, width = "95%") {
       sprintf("<p style='color:#a00'><em>Missing image: %s</em></p>", file.path(dir, file %||% ""))))
   }
   
-  # Prefer repo-relative if possible
+  # Use realtive path if posible
   use_path <- normalizePath(path, winslash = "/", mustWork = TRUE)
   if (requireNamespace("here", quietly = TRUE)) {
     root <- normalizePath(here::here(), winslash = "/", mustWork = TRUE)
@@ -168,7 +168,7 @@ show_png <- function(dir, file = NULL, caption = NULL, width = "95%") {
     if (file.exists(rel)) use_path <- rel
   }
   
-  # If knitting self-contained, let knitr embed it for us
+  # If knitting self-contained, let knitr embed it
   selfc <- isTRUE(knitr::opts_knit$get("self.contained"))
   if (selfc) {
     # Optional caption line (knitr won’t add one here)
@@ -197,7 +197,7 @@ show_png <- function(dir, file = NULL, caption = NULL, width = "95%") {
 }
 
 
-# -------- Conditional source helper ------------------------------------------
+# Source helper 
 source_if <- function(..., local = if (exists("knitr")) knitr::knit_global() else parent.frame()) {
   paths <- unlist(list(...))
   paths <- paths[nzchar(paths)]
@@ -222,7 +222,7 @@ panel_limits <- function(p) {
 }
 
 
-# Sanitize captions for LaTeX output (escape characters that break TeX)
+# Escape LaTeX sensitive characters
 cap_sanitize <- function(x) {
   if (knitr::is_latex_output()) {
     x <- gsub("\\", "\\textbackslash{}", x, fixed = TRUE)
