@@ -2,7 +2,7 @@ if (!exists("%||%")) {
   `%||%` <- function(a,b) if (is.null(a) || length(a)==0 || (length(a)==1 && is.na(a))) b else a
 }
 
-# Save a ggplot to /figs (PNG only)
+# Save a ggplot to /figs (PNG only) 
 save_plot <- function(p, filename, width = 6, height = 5, dpi = 600){
   if (!requireNamespace("here", quietly = TRUE)) stop("Package 'here' is required.")
   dir.create(here::here("figs"), recursive = TRUE, showWarnings = FALSE)
