@@ -1,5 +1,5 @@
 # ==============================================
-# File: R/tables.R  (hardened)
+# File: R/tables.R
 # ==============================================
 
 .path_join <- function(...) {
@@ -25,7 +25,7 @@ excel_tbl <- function(df, file, sheet = "Sheet1"){
 safe_chr <- function(x, n) if (is.null(x)) rep(NA_character_, n) else as.character(x)
 safe_num <- function(x, n) if (is.null(x)) rep(NA_real_, n) else suppressWarnings(as.numeric(x))
 
-# ---- Canonical mapping helpers (DO NOT CHANGE) -------------------------------
+# ---- Canonical mapping helpers (DO NOT CHANGE!!!) -------------------------------
 .abcd_keys <- function() c(
   "pct_mrdneg_petpos",  # a: MRD− / PET+
   "pct_mrdneg_petneg",  # b: MRD− / PET−
@@ -105,7 +105,7 @@ table1_characteristics <- function(mrd_df){
     f <- if (is.null(fallback)) rep(NA_character_, n_rows) else as.character(fallback)
     ifelse(!is.na(p) & nzchar(p), p, f)
   }
-  pick1_vec <- function(..., .n) {  # same helper you used in the Rmd
+  pick1_vec <- function(..., .n) {  # same helper used in the Rmd
     xs <- list(...)
     for (i in seq_along(xs)) {
       if (is.null(xs[[i]])) xs[[i]] <- rep(NA_character_, .n)
@@ -180,7 +180,7 @@ table2_concordance <- function(conc_per_study,
     }
   }
   
-  # Recompute from canonical mapping
+  # Recompute from mapping
   recomputed <- .recalc_concordance(conc_per_study)
   
   # Compare only where both are finite; otherwise fill from recomputed
@@ -336,19 +336,23 @@ export_all_tables_xlsx <- function(mrd_df, conc_per_study, file = "All_Tables.xl
 # =========================================
 # Supplementary Table S1 — Fréchet–Hoeffding κ bounds
 # =========================================
-if (is_df(fh_tbl)) {
+if (!exists("fh_tbl") || !is_df(fh_tbl)) {
+  cat("*Table S1 omitted: could not compute FH bounds.*")
+} else {
   DT::datatable(
     fh_tbl %>%
-      transmute(
+      dplyr::transmute(
         Study,
-        `FH κ bounds` = sprintf("[%.3f, %.3f]", kappa_min, kappa_max),
-        `FH agreement bounds` = sprintf("[%.1f%%, %.1f%%]", 100*po_min, 100*po_max)
+        `FH κ bounds` = sprintf("%.3f [%.3f, %.3f]", K_point, K_low, K_high),
+        `FH agreement bounds` = if (all(c("po_min","po_max") %in% names(fh_tbl))) {
+          sprintf("[%.1f%%, %.1f%%]", 100*po_min, 100*po_max)
+        } else {
+          NA_character_
+        }
       ),
     options = list(pageLength = 10, dom = "Bfrtip", buttons = c("copy","csv","excel")),
     extensions = "Buttons",
     caption = htmltools::tags$caption(style="caption-side: top; text-align: left;",
                                       htmltools::HTML("<b>Table S1.</b> Fréchet–Hoeffding bounds for agreement and Cohen’s κ (no imputation)."))
   )
-} else {
-  cat("*Table S1 omitted: could not compute FH bounds.*")
 }
