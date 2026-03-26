@@ -1,5 +1,5 @@
 # ------------------------------------------------------------
-# Canonical 2×2 mapping used everywhere in this pipeline
+# Canonical 2×2 mapping (Standardised)
 #   a = MRD− / PET+   (discordant)
 #   b = MRD− / PET−   (concordant dual-negative)
 #   c = MRD+ / PET−   (discordant)
@@ -13,7 +13,7 @@
 
 `%||%` <- function(a,b) if (is.null(a) || length(a)==0 || (length(a)==1 && is.na(a))) b else a
 
-# ---- Validation: enforce canonical mapping & sane counts ---------------------
+# ---- Validation---------------------
 .assert_cols <- function(df, cols) {
   miss <- setdiff(cols, names(df))
   if (length(miss)) stop("Missing required columns: ", paste(miss, collapse=", "))
@@ -25,6 +25,7 @@
   x_ok | is.na(x)
 }
 
+#troubleshoot
 assert_abcd <- function(df) {
   .assert_cols(df, c("a","b","c","d"))
   a <- suppressWarnings(as.numeric(df$a))
@@ -78,7 +79,7 @@ compute_concordance <- function(df) {
   x$a <- numify(x$a); x$b <- numify(x$b); x$c <- numify(x$c); x$d <- numify(x$d)
   x$n <- numify(x$n %||% (x$a + x$b + x$c + x$d))
   
-  assert_abcd(x)  # enforce mapping & counts sanity
+  assert_abcd(x)
   
   # Build tables in fixed orientation
   tab_list <- mapply(function(b,a,c,d) .tab2x2(a=a,b=b,c=c,d=d), x$b, x$a, x$c, x$d, SIMPLIFY = FALSE)
