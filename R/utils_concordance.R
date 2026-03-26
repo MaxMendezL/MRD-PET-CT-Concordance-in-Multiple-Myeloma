@@ -149,7 +149,7 @@ assert_canonical_from_perc <- function(df, tol_count = 1L, tol_sum = 1.0) {
     apply(is.finite(as.matrix(P)), 1, all)
   if (!any(ok)) return(invisible(TRUE))
   
-  # Rebuild counts from % using your largest-remainder helper
+  # Rebuild counts from % 
   recon <- t(vapply(which(ok), function(i) .lr_counts(as.numeric(P[i, ]), df$n[i]), numeric(4)))
   
   diffs <- abs(recon - as.matrix(df[ok, c("a","b","c","d")]))
