@@ -1,4 +1,3 @@
-# File: R/figures.R
 if (!exists("%||%")) {
   `%||%` <- function(a,b) if (is.null(a) || length(a)==0 || (length(a)==1 && is.na(a))) b else a
 }
@@ -73,12 +72,12 @@ strip_titles <- function(p) p
 # Silently ignores unknown args (e.g., figure_type).
 save_lancet_all <- function(p,
                             file_png  = NULL,        # old style: full path with .png
-                            file_base = NULL,        # new style: path WITHOUT extension
+                            file_base = NULL,        # new style: path withouth extension
                             layout    = c("onecol", "twocol"),
                             height_mm = 120,
                             png_dpi   = 600,
                             bg        = "white",
-                            ...) {                   # <-- absorbs figure_type or other extras
+                            ...) {                  
   layout <- match.arg(layout)
   dims <- lan_dim(layout, height_mm)
   
@@ -118,7 +117,6 @@ if (!exists("save_plot_hi")) {
     invisible(out)  }
 }
 
-# this shim will mask it and keep the figure_type argument working.
 if (!exists("save_lancet") || length(formals(save_lancet)) < 5) {
   save_lancet <- function(p, file_png,
                           layout = c("onecol","twocol"),
@@ -228,13 +226,35 @@ fig_concordance_forest_pretty <- function(per_study, pooled = NULL,
       silent = TRUE
     )
     if (!inherits(fit, "try-error")) {
+      
+      pr <- try(metafor::predict(fit), silent = TRUE)
+      
+      pi_l <- if (!inherits(pr, "try-error")) as.numeric(pr$pi.lb) else NA_real_
+      pi_u <- if (!inherits(pr, "try-error")) as.numeric(pr$pi.ub) else NA_real_
+      
+      # Optional: clamp PI to [-1, 1] because κ is bounded
+      pi_l <- if (is.finite(pi_l)) max(-1, pi_l) else NA_real_
+      pi_u <- if (is.finite(pi_u)) min( 1, pi_u) else NA_real_
+      
       pooled <- list(
         estimate = as.numeric(fit$b),
         ci_l     = as.numeric(fit$ci.lb),
         ci_u     = as.numeric(fit$ci.ub),
         tau2     = as.numeric(fit$tau2),
-        I2       = as.numeric(fit$I2)
+        I2       = as.numeric(fit$I2),
+        pi_l    = pi_l,
+        pi_u    = pi_u
+      
       )
+      
+      pr <- try(metafor::predict(fit), silent = TRUE)
+      
+      pi_l <- if (!inherits(pr, "try-error")) as.numeric(pr$pi.lb) else NA_real_
+      pi_u <- if (!inherits(pr, "try-error")) as.numeric(pr$pi.ub) else NA_real_
+      
+      # Optional: clamp PI to [-1, 1] because κ is bounded
+      pi_l <- if (is.finite(pi_l)) max(-1, pi_l) else NA_real_
+      pi_u <- if (is.finite(pi_u)) min( 1, pi_u) else NA_real_
     }
   }
   
@@ -245,6 +265,8 @@ fig_concordance_forest_pretty <- function(per_study, pooled = NULL,
   k_u   <- pooled[["ci_u"]]     %||% NA_real_
   tau2  <- pooled[["tau2"]]     %||% 0
   I2    <- pooled[["I2"]]       %||% NA_real_
+  pi_l  <- pooled[["pi_l"]] %||% NA_real_
+  pi_u  <- pooled[["pi_u"]] %||% NA_real_
   
   
   # derive n per study if available (on filtered df)
@@ -447,15 +469,14 @@ fig_survival_forest_pretty <- function(surv_df,
   
   pi_txt <- if (!inherits(pr, "try-error") &&
                 all(is.finite(c(pr$pi.lb, pr$pi.ub)))) {
-    sprintf("; PI = %.2f to %.2f", pr$pi.lb, pr$pi.ub)
+    sprintf(" | PI %.2f–%.2f", pr$pi.lb, pr$pi.ub)
   } else ""
   
   # ---------- 3. Per-study HR + CI + weights --------------------------------
   per <- df %>%
     dplyr::transmute(
       Study      = .data$Study,
-      StudyShort = if ("StudyShort" %in% names(surv_df))
-        surv_df$StudyShort else .data$Study,
+      StudyShort = if ("StudyShort" %in% names(surv_df)) surv_df$StudyShort else .data$Study,
       logHR      = .data$logHR,
       SE         = .data$SE,
       logHR_lo   = .data$logHR - 1.96 * .data$SE,
@@ -479,15 +500,27 @@ fig_survival_forest_pretty <- function(surv_df,
     dplyr::arrange(dplyr::desc(w_pct)) %>%
     dplyr::mutate(row_id = dplyr::row_number())
   
-  # ---------- 4. Axis limits + GUTTERS (same structure as Fig 2B) -----------
-  hr_ticks <- c(0.25, 0.5, 1, 2, 4)
-  axis_lim <- log(hr_ticks[c(1, length(hr_ticks))])
-  xlim     <- c(axis_lim[1] - 0.8, axis_lim[2] + 1.6)
-  x_left   <- axis_lim[1] - 0.6    # N column
-  x_right  <- axis_lim[2] + 0.6    # Weight/CI column
+  # ---------- 4. Axis limits + GUTTERS --------------------------------------
+  hr_ticks <- c(0.5, 1, 1.5, 2, 2.5, 3)
   
-  # show or hide N column depending on availability
+  # Compute x-range from data (log scale), with a small gutter
+  x_core <- range(c(df_hr$logHR_lo, df_hr$logHR_hi, 0, pooled_logHR, ci_log_l, ci_log_u), na.rm = TRUE)
+  
+  # Keep limits wide enough
+  axis_lim <- range(c(log(min(hr_ticks)), log(max(hr_ticks)), x_core), na.rm = TRUE)
+  
+  # Add space for gutters
+  xlim <- c(axis_lim[1] - 0.35, axis_lim[2] + 0.65)
+  
+  # Update gutter positions to follow the final axis
+  x_left  <- axis_lim[1] - 0.25
+  x_right <- axis_lim[2] + 0.25
+  
+  
   show_N <- any(is.finite(df_hr$N))
+  
+  # Pooled row placed below all studies
+  y_sum <- max(df_hr$row_id) + 0.9
   
   # ---------- 5. Plot --------------------------------------------------------
   p <- ggplot2::ggplot(df_hr, ggplot2::aes(y = row_id)) +
@@ -500,46 +533,70 @@ fig_survival_forest_pretty <- function(surv_df,
       shape = 22, stroke = 0.3, fill = "black"
     ) +
     ggplot2::scale_size(range = c(1.8, 6.0), guide = "none") +
-    ggplot2::geom_vline(xintercept = 0,
-                        linetype = "dashed", linewidth = 0.4) +
-    { if (is.finite(pooled_logHR))
-      ggplot2::geom_vline(xintercept = pooled_logHR,
-                          linetype = "dashed", linewidth = 0.4) } +
     
-    # --- Left N column (only if provided) ---
+    # Reference line at HR=1 (dotted) + pooled (dashed)
+    ggplot2::geom_vline(xintercept = 0, linetype = "dotted", linewidth = 0.45) +
+    { if (is.finite(pooled_logHR))
+      ggplot2::geom_vline(xintercept = pooled_logHR, linetype = "dashed", linewidth = 0.55) } +
+    
+    # ---- Pooled summary row: CI + diamond ----
+  { if (is.finite(pooled_logHR))
+    ggplot2::geom_errorbarh(
+      ggplot2::aes(y = y_sum),
+      xmin = ci_log_l, xmax = ci_log_u,
+      height = 0.0, linewidth = 0.85
+    ) } +
+    { if (is.finite(pooled_logHR))
+      ggplot2::geom_point(
+        ggplot2::aes(y = y_sum),
+        x = pooled_logHR,
+        shape = 23, size = 4.8, stroke = 0.4, fill = "black"
+      ) } +
+    
+    # --- Left N column ---
     { if (show_N)
       ggplot2::geom_text(
-        ggplot2::aes(
-          x     = x_left,
-          label = ifelse(is.finite(N), scales::comma(N), "")
-        ),
+        ggplot2::aes(x = x_left, label = ifelse(is.finite(N), scales::comma(N), "")),
         hjust = 1, size = 3
       ) } +
     { if (show_N)
       ggplot2::annotate(
-        "text", x = x_left, y = max(df_hr$row_id) + 0.65,
+        "text", x = x_left, y = y_sum + 0.55,
         label = "N", hjust = 1, fontface = "bold", size = 3.3
       ) } +
     
-    # --- Right weight + HR[CI] ---
+    # --- Right weight + HR[CI] for studies ---
     ggplot2::geom_text(
       ggplot2::aes(
         x     = x_right,
-        label = sprintf("%.1f   %.2f [%.2f, %.2f]",
-                        w_pct, HR, CI_lower, CI_upper)
+        label = sprintf("%.1f   %.2f [%.2f, %.2f]", w_pct, HR, CI_lower, CI_upper)
       ),
-      hjust = 0, size = 3
+      hjust = 0, size = 2.8
     ) +
     ggplot2::annotate(
-      "text", x = x_right, y = max(df_hr$row_id) + 0.65,
-      label = "Weight (%)   HR [95% CI]",
-      hjust = 0, fontface = "bold", size = 3.3
+      "text", x = x_right, y = y_sum + 0.55,
+      label = "Weight   HR [95% CI]",
+      hjust = 0, fontface = "bold", size = 3.2
     ) +
     
+    # --- Right pooled row ---
+    { if (is.finite(pooled_HR))
+      ggplot2::annotate(
+        "text", x = x_right, y = y_sum,
+        label = sprintf("—   %.2f [%.2f, %.2f]", pooled_HR, ci_HR_l, ci_HR_u),
+        hjust = 0, size = 2.9, fontface = "bold"
+      ) } +
+    { if (is.finite(tau2) && is.finite(I2))
+      ggplot2::annotate(
+        "text", x = x_right, y = y_sum - 0.42,
+        label = sprintf("\u03C4\u00B2 = %.3f; I\u00B2 = %.0f%%%s", tau2, I2, pi_txt),
+        hjust = 0, size = 2.8
+      ) } +
+    
     ggplot2::scale_y_continuous(
-      breaks = df_hr$row_id,
-      labels = df_hr$StudyShort,
-      expand = ggplot2::expansion(add = c(0.8, 1.0))
+      breaks = c(df_hr$row_id, y_sum),
+      labels = c(df_hr$StudyShort, "Pooled (REML)"),
+      expand = ggplot2::expansion(add = c(0.8, 1.2))
     ) +
     ggplot2::scale_x_continuous(
       limits = xlim,
@@ -555,10 +612,10 @@ fig_survival_forest_pretty <- function(surv_df,
       panel.grid.major.x = ggplot2::element_line(colour = "grey85", linewidth = 0.3),
       axis.title.y       = ggplot2::element_blank(),
       axis.text.y        = ggplot2::element_text(hjust = 1),
-      plot.margin        = ggplot2::margin(t = 10, r = 150, b = 10, l = 80)
+      plot.margin        = ggplot2::margin(t = 10, r = 170, b = 10, l = 90)
     )
   
-  # ---------- 6. Save figure (NO internal pooled-HR frame) ------------------
+  # ---------- 6. Save figure ------------------------------------------------
   save_lancet_all(
     p, here::here("figs", out),
     layout = "twocol", height_mm = 120, figure_type = "line"
@@ -566,6 +623,7 @@ fig_survival_forest_pretty <- function(surv_df,
   
   p
 }
+
 
 #############################
 
@@ -1145,7 +1203,6 @@ run_sf3_sim <- function(mrd,
 
 # ================================
 # Supplementary integration: S1/S2/S3
-# Paste these chunks after your existing analysis sections
 # ================================
 
 # --- (once) ensure gtools for Dirichlet draws (quietly) ---
@@ -1309,16 +1366,16 @@ forest_lancet_bw_hr <- function(
     at_hr     = c(0.25, 0.5, 1, 2, 4),
     width_mm  = 107,
     height_mm = NULL,
-    cex_body  = 0.8
+    cex_body  = 0.8,
+    show_pi   = TRUE
 ){
   stopifnot(inherits(fit, "rma.uni"))
   k <- length(stats::weights(fit))
   
-  # ---- dynamic height: ~9 mm per row + header ------------------------------
-  if (is.null(height_mm)) height_mm <- 18 + 9 * k
+  # ---- dynamic height: ~9 mm per row + extra room for pooled stats ----------
+  if (is.null(height_mm)) height_mm <- 22 + 9 * k   # slightly taller for summary line
   
   # ---- extract per-study info ---------------------------------------------
-  # N: prefer an explicit N column; otherwise leave blank (better than guessing wrong)
   n <- if ("N" %in% names(tab)) {
     tab$N
   } else if ("n" %in% names(tab)) {
@@ -1335,7 +1392,6 @@ forest_lancet_bw_hr <- function(
     as.character(seq_len(k))
   }
   
-  # log(HR) variance if needed
   vi <- if ("vi" %in% names(tab)) {
     tab$vi
   } else if ("SE" %in% names(tab)) {
@@ -1366,6 +1422,27 @@ forest_lancet_bw_hr <- function(
   x_est  <- alim[2] + 2.75         # estimate [CI]
   xlim   <- c(alim[1] - 1.15, alim[2] + 3.1)
   
+  # ---- pooled estimates + heterogeneity (for reviewer request) -------------
+  mu    <- as.numeric(fit$b)       # pooled log(HR)
+  ci_lb <- as.numeric(fit$ci.lb)
+  ci_ub <- as.numeric(fit$ci.ub)
+  tau2  <- as.numeric(fit$tau2)
+  I2    <- as.numeric(fit$I2)
+  
+  # Prediction interval (optional)
+  pi_txt <- ""
+  if (isTRUE(show_pi)) {
+    pr <- try(metafor::predict(fit), silent = TRUE)
+    if (!inherits(pr, "try-error") && all(is.finite(c(pr$pi.lb, pr$pi.ub)))) {
+      pi_txt <- sprintf("; PI = %.2f–%.2f", exp(pr$pi.lb), exp(pr$pi.ub))
+    }
+  }
+  
+  pooled_line <- sprintf(
+    "Pooled (REML, Knapp–Hartung): HR = %.2f (%.2f–%.2f); \u03C4\u00B2 = %.3f; I\u00B2 = %.0f%%%s",
+    exp(mu), exp(ci_lb), exp(ci_ub), tau2, I2, pi_txt
+  )
+  
   draw_once <- function() {
     op <- par(
       mar = c(4, 5, 2, 2),
@@ -1376,21 +1453,21 @@ forest_lancet_bw_hr <- function(
     )
     on.exit(par(op), add = TRUE)
     
-    # main forest (squares; no metafor header or RE polygon)
+    # main forest (squares; no metafor header)
     do.call(metafor::forest, list(
-      x          = fit,
-      slab       = study,
-      atransf    = exp,
-      xlab       = paste0(xlab, " — log scale"),
-      xlim       = xlim,
-      alim       = alim,
-      at         = at,
-      psize      = psize,
-      col        = "black",
-      header     = FALSE,
-      annotate   = FALSE,
-      addfit     = FALSE,
-      showweights= FALSE
+      x           = fit,
+      slab        = study,
+      atransf     = exp,
+      xlab        = paste0(xlab, " — log scale"),
+      xlim        = xlim,
+      alim        = alim,
+      at          = at,
+      psize       = psize,
+      col         = "black",
+      header      = FALSE,
+      annotate    = FALSE,
+      addfit      = TRUE,   # <-- ADD pooled diamond
+      showweights = FALSE
     ))
     
     # reference line at HR = 1
@@ -1398,15 +1475,14 @@ forest_lancet_bw_hr <- function(
     
     # headers
     y_top <- par("usr")[4] - 0.5
-    text(x_left, y_top, "N",          cex = 0.85, font = 2, pos = 4)
-    text(x_w,    y_top, "Weight (%)", cex = 0.85, font = 2, pos = 2)
-    text(x_est,  y_top, "Estimate [95% CI]", cex = 0.85, font = 2, pos = 2)
+    text(x_left, y_top, "N",                  cex = 0.85, font = 2, pos = 4)
+    text(x_w,    y_top, "Weight (%)",         cex = 0.85, font = 2, pos = 2)
+    text(x_est,  y_top, "Estimate [95% CI]",  cex = 0.85, font = 2, pos = 2)
     
     # rows (1 = bottom in metafor’s forest)
     y_rows  <- k:1
     num_cex <- 0.9 * cex_body
     
-    # N (only if at least one non-NA)
     if (any(!is.na(n))) {
       text(x_left, y_rows,
            labels = ifelse(is.na(n), "", format(n, big.mark = ",")),
@@ -1415,6 +1491,15 @@ forest_lancet_bw_hr <- function(
     
     text(x_w,   y_rows, w_txt,   pos = 2, cex = num_cex)
     text(x_est, y_rows, est_txt, pos = 2, cex = num_cex)
+    
+    # ---- Add pooled stats line in-figure (tau^2, I^2, PI) ------------------
+    # In metafor forest, pooled row is at y = 0
+    y_pool <- 0
+    text(
+      x = x_est, y = y_pool - 0.8,
+      labels = pooled_line,
+      pos = 2, cex = 0.85 * cex_body
+    )
     
     invisible(TRUE)
   }
@@ -1438,7 +1523,7 @@ forest_lancet_bw_hr <- function(
   draw_once(); grDevices::dev.off()
   
   grDevices::png(png_path, width = w_in, height = h_in,
-                 units = "in", res = 300, type = "cairo", bg = "white")
+                 units = "in", res = 600, type = "cairo", bg = "white")
   draw_once(); grDevices::dev.off()
   
   invisible(list(pdf = pdf_path, eps = eps_path, png = png_path))
@@ -1472,29 +1557,12 @@ prep_discordance_df <- function(per_study) {
 
 #####################
 
-fig_2B_primary_lancet <- function(per_study_primary,
-                                  out_file = here::here("figs","Figure_2B_Directional_Discordance_PRIMARY.png")) {
-  df_disc <- prep_discordance_df(per_study_primary)
-  if (is.null(df_disc) || nrow(df_disc) < 2L) return(invisible(NULL))
-  
-  # REML + Knapp–Hartung meta-analysis on log-odds
-  res <- metafor::rma(yi = df_disc$yi, vi = df_disc$vi,
-                      method = "REML", test = "knha")
-  
-  forest_2B_lancet(
-    d        = df_disc,
-    res      = res,
-    title    = "B. Directional discordance (primary analysis: log-odds)",
-    out_file = out_file
-  )
-}
-
-####################
-
 forest_2B_lancet <- function(d, res, title = "B. Directional discordance (log-odds)",
                              out_file = here::here("figs","Figure_2B_Directional_Discordance.png"),
                              also_pdf = TRUE) {
   stopifnot(nrow(d) >= 2)
+  
+  # ---- Prep dataframe ----
   d2 <- d %>%
     dplyr::mutate(
       w_RE  = 1/(vi + res$tau2),
@@ -1503,88 +1571,136 @@ forest_2B_lancet <- function(d, res, title = "B. Directional discordance (log-od
       yi_hi = yi + 1.96*se
     ) %>%
     dplyr::arrange(dplyr::desc(w_pct)) %>%
-    dplyr::mutate(row_id = dplyr::row_number())
+    dplyr::mutate(row_id = dplyr::row_number())  # 1..k
   
-  # Symmetric x-limits around 0 based on the data, with gutters for N and Weight columns
-  x_core <- range(c(d2$yi_lo, d2$yi_hi, as.numeric(res$b), 0), na.rm = TRUE)
-  xmax   <- max(abs(x_core))
-  xmax   <- min(4, max(1, xmax * 1.05))           # cap at ±4
-  x_core <- c(-xmax, xmax)
-  pad    <- 0.20 * diff(x_core)                   # extra space for text gutters
+  k <- nrow(d2)
   
-  # --- X range: keep grid at -6..6, push text outside that frame -------------
-  axis_lim <- c(-6, 6)      # where tick marks + grid lines live
-  pad      <- 0.8           # extra space on each side for text gutters
+  # ---- Pooled stats ----
+  mu    <- as.numeric(res$b)
+  ci_lb <- as.numeric(res$ci.lb)
+  ci_ub <- as.numeric(res$ci.ub)
   
-  # full plotting range (so text is not clipped)
-  xlim   <- c(axis_lim[1] - pad, axis_lim[2] + pad)
+  # Prediction interval (optional, for right-gutter note)
+  pr <- try(metafor::predict(res), silent = TRUE)
+  pi_lb <- if (!inherits(pr, "try-error") && is.finite(pr$pi.lb)) as.numeric(pr$pi.lb) else NA_real_
+  pi_ub <- if (!inherits(pr, "try-error") && is.finite(pr$pi.ub)) as.numeric(pr$pi.ub) else NA_real_
+  pi_txt <- if (is.finite(pi_lb) && is.finite(pi_ub)) sprintf(" | PI %.2f–%.2f", pi_lb, pi_ub) else ""
   
-  # N column just to the left of x = -6
-  x_left  <- axis_lim[1] - 0.25   # e.g. -6.25
+  # ---- Layout: axis + gutters ----
+  axis_lim <- c(-6, 6)      # tick/grid limits
+  pad      <- 0.8           # extra x-space for left/right gutters
+  xlim     <- c(axis_lim[1] - pad, axis_lim[2] + pad)
   
-  # Weight / Estimate column just to the right of x = 6
-  x_right <- axis_lim[2] + 0.25   # e.g.  6.25
+  # gutter x positions
+  x_left   <- axis_lim[1] - 0.25   # N column (left)
+  x_right  <- axis_lim[2] + 0.25   # Weight/Estimate column (right)
   
+  # pooled row position: BELOW the last study but ABOVE bottom margin
+  y_sum <- max(d2$row_id) + 0.9
   
-  
+  # ---- Plot ----
   p <- ggplot2::ggplot(d2, ggplot2::aes(y = row_id)) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmin = yi_lo, xmax = yi_hi),
-                            height = 0.18, linewidth = 0.5) +
-    ggplot2::geom_point(ggplot2::aes(x = yi, size = w_pct),
-                        shape = 22, stroke = 0.3, fill="black") +
+    # Study CIs + squares
+    ggplot2::geom_errorbarh(
+      ggplot2::aes(xmin = yi_lo, xmax = yi_hi),
+      height = 0.18, linewidth = 0.5
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(x = yi, size = w_pct),
+      shape = 22, stroke = 0.3, fill = "black"
+    ) +
     ggplot2::scale_size(range = c(1.4, 4.8), guide = "none") +
-    ggplot2::geom_vline(xintercept = 0,linetype = "dashed", linewidth = 0.4) +
-    ggplot2::geom_vline(xintercept = as.numeric(res$b), linetype = "dashed", linewidth = 0.5, colour = "#333333") +
-    # Left "N" column
-    ggplot2::geom_text(ggplot2::aes(x = x_left, label = ifelse(is.finite(N), scales::comma(N), "NA")),
-                       hjust = 1, size = 3) +
-    ggplot2::annotate("text", x = x_left, y = max(d2$row_id) + 0.65, label = "N",
-                      hjust = 1, fontface = "bold", size = 3.3) +
-    # Right "Weight   Estimate [95% CI]" column
-    ggplot2::geom_text(
-      ggplot2::aes(
-        x = x_right,
-        label = sprintf("%.1f   %.2f [%.2f, %.2f]", w_pct, yi, yi_lo, yi_hi)
-      ),
-      hjust = 0, size = 3
+    
+    # Reference lines: 0 dotted, pooled dashed
+    ggplot2::geom_vline(xintercept = 0,  linetype = "dotted", linewidth = 0.45) +
+    ggplot2::geom_vline(xintercept = mu, linetype = "dashed", linewidth = 0.55, colour = "#333333") +
+    
+    # ---- Pooled summary (diamond + CI) ----
+  ggplot2::geom_errorbarh(
+    ggplot2::aes(y = y_sum),
+    xmin = ci_lb, xmax = ci_ub,
+    height = 0.0, linewidth = 0.85
+  ) +
+    ggplot2::geom_point(
+      ggplot2::aes(y = y_sum),
+      x = mu,
+      shape = 23, size = 4.5, stroke = 0.4, fill = "black"
     ) +
-    labs(x = "log-odds (MRD−/PET+ vs MRD+/PET−) (95% CI)\n>0 = MRD−/PET+ predominance; <0 = MRD+/PET− predominance") +
-    ggplot2::annotate("text", x = x_right, y = max(d2$row_id) + 0.65,
-                      label = "Weight (%)   Estimate [95% CI]",
-                      hjust = 0, fontface = "bold", size = 3.3) +
-    ggplot2::scale_y_continuous(
-      breaks = d2$row_id, labels = d2$StudyShort,
-      expand = ggplot2::expansion(add = c(0.8, 1.0))
+    
+    # ---- Left N column (studies only) ----
+  ggplot2::geom_text(
+    ggplot2::aes(x = x_left, label = ifelse(is.finite(N), scales::comma(N), "")),
+    hjust = 1, size = 3
+  ) +
+    ggplot2::annotate(
+      "text", x = x_left, y = y_sum + 0.55, label = "N",
+      hjust = 1, fontface = "bold", size = 3.3
     ) +
-    ggplot2::scale_x_continuous(
-      limits = xlim,
-      breaks = seq(axis_lim[1], axis_lim[2], by = 2),
-      name   = "log-odds (MRD−/PET+ vs MRD+/PET−) (95% CI)"
+    
+    # ---- Right column: study rows (smaller font for cleanliness) ----
+  ggplot2::geom_text(
+    ggplot2::aes(
+      x = x_right,
+      label = sprintf("%.1f   %.2f [%.2f, %.2f]", w_pct, yi, yi_lo, yi_hi)
+    ),
+    hjust = 0, size = 2.8
+  ) +
+    ggplot2::annotate(
+      "text", x = x_right, y = y_sum + 0.55,
+      label = "Weight   Estimate [95% CI]",
+      hjust = 0, fontface = "bold", size = 3.2
     ) +
+    
+    # ---- Right column: pooled row (ONLY here; no extra text in plot area) ----
+  ggplot2::annotate(
+    "text", x = x_right, y = y_sum,
+    label = sprintf("—   %.2f [%.2f, %.2f]", mu, ci_lb, ci_ub),
+    hjust = 0, size = 2.9, fontface = "bold"
+  ) +
+    ggplot2::annotate(
+      "text", x = x_right, y = y_sum - 0.42,
+      label = sprintf("\u03C4\u00B2 = %.3f; I\u00B2 = %.0f%%%s",
+                      as.numeric(res$tau2), as.numeric(res$I2), pi_txt),
+      hjust = 0, size = 2.8
+    ) +
+    
+    # ---- Y axis labels: add pooled label once (avoid duplicates) ----
+  ggplot2::scale_y_continuous(
+    breaks = c(d2$row_id, y_sum),
+    labels = c(d2$StudyShort, "Pooled (REML)"),
+    expand = ggplot2::expansion(add = c(0.9, 1.2))
+  ) +
+    
+    # ---- X axis ----
+  ggplot2::scale_x_continuous(
+    limits = xlim,
+    breaks = seq(axis_lim[1], axis_lim[2], by = 2),
+    name   = "log-odds (MRD−/PET+ vs MRD+/PET−) (95% CI)\n>0 = MRD−/PET+ predominance; <0 = MRD+/PET− predominance"
+  ) +
+    
     ggplot2::coord_cartesian(clip = "off") +
     ggplot2::labs(title = title) +
-    ggplot2::theme_minimal(base_size = 10,
-                           base_family = if (Sys.info()[["sysname"]] %in% c("Darwin","Linux")) "Helvetica" else "Arial") +
+    ggplot2::theme_minimal(
+      base_size = 10,
+      base_family = if (Sys.info()[["sysname"]] %in% c("Darwin","Linux")) "Helvetica" else "Arial"
+    ) +
     ggplot2::theme(
       panel.grid.minor = ggplot2::element_blank(),
       panel.grid.major.y = ggplot2::element_blank(),
       panel.grid.major.x = ggplot2::element_line(colour = "grey90", linewidth = 0.25),
       axis.title.y = ggplot2::element_blank(),
-      plot.margin = ggplot2::margin(t = 10, r = 170, b = 10, l = 100),
+      # more right margin to avoid clipping and improve gutter spacing
+      plot.margin = ggplot2::margin(t = 10, r = 200, b = 10, l = 110),
       legend.position = "none"
     )
   
   print(p)
   
-  # Caption + export (mirrors 2A)
-  pr <- try(metafor::predict(res), silent = TRUE)
-  pi_txt <- if (!inherits(pr, "try-error") && all(is.finite(c(pr$pi.lb, pr$pi.ub))))
-    sprintf("; PI = %.2f–%.2f", pr$pi.lb, pr$pi.ub) else ""
-  
+  # ---- Caption (matches line types) ----
   cap <- sprintf(
     "B. Directional discordance: log-odds(MRD−/PET+ vs MRD+/PET−). Dotted vertical line = 0; dashed = pooled (REML, Knapp–Hartung). Pooled = %.2f (%.2f–%.2f); \u03C4\u00B2 = %.3f; I\u00B2 = %.0f%%%s.",
-    as.numeric(res$b), as.numeric(res$ci.lb), as.numeric(res$ci.ub),
-    as.numeric(res$tau2), as.numeric(res$I2), pi_txt
+    mu, ci_lb, ci_ub, as.numeric(res$tau2), as.numeric(res$I2),
+    if (is.finite(pi_lb) && is.finite(pi_ub)) sprintf("; PI = %.2f–%.2f", pi_lb, pi_ub) else ""
   )
   
   if (requireNamespace("knitr", quietly = TRUE) &&
@@ -1595,14 +1711,19 @@ forest_2B_lancet <- function(d, res, title = "B. Directional discordance (log-od
     ))
   }
   
+  # ---- Export ----
   if (requireNamespace("fs", quietly = TRUE)) fs::dir_create(dirname(out_file))
   ggplot2::ggsave(out_file, p, width = 7.5, height = 6, dpi = 600, bg = "white")
+  
   if (capabilities("cairo") && also_pdf) {
-    grDevices::cairo_pdf(sub("\\.png$", ".pdf", out_file), width = 7.5, height = 6,
-                         family = if (Sys.info()[["sysname"]] %in% c("Darwin","Linux")) "Helvetica" else "Arial")
-    print(p); grDevices::dev.off()
+    grDevices::cairo_pdf(
+      sub("\\.png$", ".pdf", out_file),
+      width = 7.5, height = 6,
+      family = if (Sys.info()[["sysname"]] %in% c("Darwin","Linux")) "Helvetica" else "Arial"
+    )
+    print(p)
+    grDevices::dev.off()
   }
   
   invisible(list(plot = p, res = res, df = d2, caption = cap, file = out_file))
 }
-
