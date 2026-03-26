@@ -1,5 +1,5 @@
 # ======================================================================
-# File: R/lancet_upgrades.R   (cleaned + small hardening tweaks)
+# File: R/lancet_upgrades.R 
 # ======================================================================
 
 suppressPackageStartupMessages({
@@ -165,7 +165,7 @@ save_lancet <- function(plot, file,
   ggplot2::ggsave(filename = file, plot = plot,
                   width = width_mm/25.4, height = height_mm/25.4,
                   units = "in", dpi = dpi, bg = bg, ...)
-  invisible(normalizePath(file, mustWork = FALSE))  # <-- invisible
+  invisible(normalizePath(file, mustWork = FALSE))  # invisible
 }
 
 
