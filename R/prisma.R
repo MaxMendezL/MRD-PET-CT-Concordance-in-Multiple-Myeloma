@@ -1,11 +1,7 @@
 # prisma.R
-# Build a PRISMA 2020 study-selection diagram from a screening log.
-# Exports PNG + PDF + SVG (editable) to satisfy Lancet's requirement
-# for an editable study-selection flow figure in systematic reviews/
-# meta-analyses.
+# Build a PRISMA 2020 study-selection diagram from the screening log.
+# Save SVG, PDF, and PNG versions for personal documentation and manuscript.
 
-# Suggested packages (install if missing):
-#   readxl, DiagrammeR, DiagrammeRsvg, rsvg, htmlwidgets
 
 # ---- helpers -------------------------------------------------------------------
 
@@ -21,7 +17,7 @@
 # Reads an Excel screening log and computes PRISMA counts plus a table of
 # full-text exclusion reasons (lowercased, trimmed).
 #
-# Heuristics accommodate common column names:
+# Format names:
 #   duplicates: is_duplicate / duplicate
 #   screened at title/abstract: title_abstract_screened / screened
 #   excluded at title/abstract: ta_exclude / excluded_title_abstract
@@ -108,7 +104,7 @@ summarise_prisma_counts <- function(path_xlsx, sheet = NULL) {
 }
 
 # ---- .export_grviz() ------------------------------------------------------------
-# Export a DiagrammeR object to SVG + PDF + PNG. SVG is the editable vector source.
+# Export a DiagrammeR object to SVG + PDF + PNG.
 
 .export_grviz <- function(gr, file_base) {
   .prisma_check_pkg("DiagrammeRsvg")
@@ -122,7 +118,7 @@ summarise_prisma_counts <- function(path_xlsx, sheet = NULL) {
   svg_path <- paste0(file_base, ".svg")
   con <- file(svg_path, open = "wb"); writeChar(svg_txt, con, eos = NULL); close(con)
   
-  # Render PDF + PNG from the SVG (both will be redrawn in-house; PDF is still vector)
+  # Render PDF + PNG from the SVG
   raw_svg <- charToRaw(svg_txt)
   rsvg::rsvg_pdf(raw_svg, paste0(file_base, ".pdf"))
   rsvg::rsvg_png(raw_svg, paste0(file_base, ".png"), width = 1800, height = 1400)
@@ -174,7 +170,7 @@ make_prisma_2020 <- function(counts,
   gr <- DiagrammeR::grViz(label)
   
   dir.create(dirname(file_base), recursive = TRUE, showWarnings = FALSE)
-  # Also save an interactive HTML for quick internal review
+  # Also save an HTML for quick internal review
   if (requireNamespace("htmlwidgets", quietly = TRUE)) {
     htmlwidgets::saveWidget(gr, paste0(file_base, ".html"), selfcontained = TRUE)
   }
@@ -184,8 +180,7 @@ make_prisma_2020 <- function(counts,
 }
 
 # ---- build_prisma_from_screening_log() ------------------------------------------
-# Convenience wrapper: read the Excel log, compute counts, export diagram,
-# and write CSVs of counts and exclusion reasons for the appendix.
+# read the Excel log, compute counts, export diagram, and write CSVs of counts and exclusion reasons for the appendix.
 
 build_prisma_from_screening_log <- function(path_xlsx,
                                             out_base = file.path(getwd(), "figs", "Figure_1_PRISMA_Diagram"),
@@ -201,3 +196,4 @@ build_prisma_from_screening_log <- function(path_xlsx,
   
   invisible(res)
 }
+
