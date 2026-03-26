@@ -1,6 +1,6 @@
 # survival_utils.R
-# Utilities to (1) enforce a consistent survival contrast orientation
-# and (2) compute log(HR) and its SE for random-effects meta-analysis.
+# Helpers for survival meta-analysis
+# Standardise HR orientation and derive logHR/SE from reported CIs
 
 # ---------------------------------------------------------------------
 # orient_survival_hr()
@@ -116,7 +116,7 @@ add_loghr_se <- function(df,
 # ---------------------------------------------------------------------
 # prepare_survival_meta()
 # ---------------------------------------------------------------------
-# One-call convenience:
+# Combind hepler:
 #  * Enforce orientation (HR<1 = dual-negative better)
 #  * Compute logHR and SE for meta-analysis (yi/sei)
 #
@@ -130,7 +130,7 @@ prepare_survival_meta <- function(df,
                                   conf.level = 0.95) {
   df1 <- orient_survival_hr(df, hr_col, lcl_col, ucl_col, ref_flag_col)
   df2 <- add_loghr_se(df1, hr_col, lcl_col, ucl_col, conf.level)
-  # Metafor-friendly aliases
+  # Metafor aliases
   df2$yi  <- df2$logHR
   df2$sei <- df2$SE
   df2
